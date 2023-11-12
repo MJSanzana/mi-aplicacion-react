@@ -1,33 +1,24 @@
-// Importa el módulo 'mysql'
+// db.js
 const mysql = require('mysql');
 
-// Limpia el caché de módulos antes de crear la conexión
-Object.keys(require.cache).forEach(function(key) {
-    delete require.cache[key];
+const pool = mysql.createPool({
+  connectionLimit: 10,
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'registro'
 });
 
-// Define la configuración de la conexión a la base de datos
-const dbConfig = {
-   host: 'localhost',
-   user: 'root', // Usuario de la base de datos
-   password: '', // Contraseña de la base de datos
-   database: 'registro'
+const query = (sql, values) => {
+  return new Promise((resolve, reject) => {
+    pool.query(sql, values, (err, results) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(results);
+    });
+  });
 };
 
-// Crea una conexión a la base de datos utilizando la configuración
-const db = mysql.createConnection(dbConfig);
+module.exports = { query };
 
-module.exports = {
-   connect: () => {
-      db.connect((err) => {
-         if (err) {
-            throw err;
-         }
-         console.log('MySQL Connected...');
-      });
-      return db;
-   },
-   query: (sql, values, callback) => {
-      return db.query(sql, values, callback);
-   }
-};
