@@ -4,7 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const db = require('../api/routes/db/db');
-const jwt = require('jsonwebtoken'); // Importación necesaria para authenticateJWT
+const jwt = require('jsonwebtoken'); 
+
 
 // Configuración de la app
 const app = express();
@@ -49,7 +50,7 @@ function authenticateJWT(req, res, next) {
 }
 
 // Añadido: Importa y usa las rutas del archivo 'index.js'
-const apiRoutes = require('../api/routes/index'); // Asegúrate de que esta ruta es la correcta y apunta a tu archivo 'index.js'
+const apiRoutes = require('../api/routes/index'); 
 app.use('/api', apiRoutes);
 
 // Inicializar el servidor
