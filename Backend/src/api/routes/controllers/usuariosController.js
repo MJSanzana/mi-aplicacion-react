@@ -2,7 +2,6 @@
 const { query } = require('../db/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { transporter, createMailOptions } = require('../../server/email');
 
 
 exports.getAllUsers = async (req, res) => {
