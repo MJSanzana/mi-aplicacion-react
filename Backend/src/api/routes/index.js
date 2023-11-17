@@ -4,10 +4,12 @@ const router = express.Router();
 
 // Importa los routers de otros archivos
 const usuariosRouter = require('./Usuarios');
+const ticketsRoutes = require ('./Tickets')
 
 
 // Aquí usas los routers importados, montándolos en su ruta específica
-router.use('/', usuariosRouter);
+router.use('/Users', usuariosRouter);
+router.use('/Tickets', ticketsRoutes);
 
 //router.use('/otroRecurso', otroRouter); // Cambia '/otroRecurso' por la ruta base que quieras para este recurso
 

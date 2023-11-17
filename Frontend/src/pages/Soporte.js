@@ -30,7 +30,7 @@ const Soporte = () => {
 
         if (Nombre && Email && CommonErrors.length > 0 && Problema) {
             try {
-                const response = await axios.post('http://localhost:5000/api/Tickets/Soporte', {
+                const response = await axios.post('http://localhost:5000/api/', {
                     Nombre,
                     Email,
                     Problema,

@@ -2,6 +2,7 @@
 const { query } = require('../db/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { transporter, createMailOptions } = require('../../server/email');
 
 
 exports.getAllUsers = async (req, res) => {
@@ -142,3 +143,14 @@ exports.reactivateUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+//Ticket levantados por el usuario
+router.get('/Tickets', (req, res) => {
+  const sql = "SELECT * FROM tickets_soporte";
+  db.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al obtener los tickets.' });
+    }
+    res.json(results);
+  });
+});

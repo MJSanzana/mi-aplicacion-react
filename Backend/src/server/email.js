@@ -1,9 +1,10 @@
 // server/email.js
 
 const nodemailer = require("nodemailer");
+require('dotenv').config();
 
+console.log(process.env.EMAIL_USER); 
 
-// Utiliza variables de entorno para almacenar información sensible
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT,
