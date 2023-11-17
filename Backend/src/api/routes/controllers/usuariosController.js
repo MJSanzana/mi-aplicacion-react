@@ -3,7 +3,6 @@ const { query } = require('../db/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
 exports.getAllUsers = async (req, res) => {
   try {
     const results = await query('SELECT * FROM Usuarios');
@@ -142,5 +141,6 @@ exports.reactivateUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 

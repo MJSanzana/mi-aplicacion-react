@@ -1,17 +1,14 @@
 // api/index.js
 const express = require('express');
 const router = express.Router();
-
-// Importa los routers de otros archivos
 const usuariosRouter = require('./Usuarios');
 const ticketsRoutes = require ('./Tickets')
+const colegiosRoutes = require ('./Colegios')
+const colegiosUsuarios = require ('./colegiosUsuarios')
 
-
-// Aquí usas los routers importados, montándolos en su ruta específica
 router.use('/Users', usuariosRouter);
 router.use('/Tickets', ticketsRoutes);
+router.use('/colegios', colegiosRoutes);
+router.use('/Asociar', colegiosUsuarios);
 
-//router.use('/otroRecurso', otroRouter); // Cambia '/otroRecurso' por la ruta base que quieras para este recurso
-
-// Exporta el router principal
 module.exports = router;
