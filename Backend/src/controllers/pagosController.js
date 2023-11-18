@@ -1,14 +1,16 @@
 // controllers/pagosController.js
-const db = require('../api/routes/db/db'); 
+const db = require('../api/routes/db/db');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+
 
 exports.registrarPago = async (req, res) => {
     const { pedido_id, metodoPago_id, usuario_id, monto, moneda, estado, proveedorPago_id, detalles } = req.body;
 
     // Puedes decidir cifrar algunos detalles del pago aquí usando crypto
     const encryptedDetails = crypto.createHmac('sha256', process.env.PAYMENT_ENCRYPTION_KEY)
-                           .update(detalles)
-                           .digest('hex');
+        .update('datos a cifrar')
+        .digest('hex');
 
     try {
         const result = await db.query(
