@@ -14,11 +14,10 @@ const detallePedidosController = require('../../controllers/detallePedidosContro
 const opinionesValoracionesController = require('../../controllers/opinionesValoracionesController');
 const enviosController = require('../../controllers/enviosController');
 const metodosPagoController = require('../../controllers/metodosPagoController');
-const pagosController = require('../../controllers/pagosController ');
+const pagosController = require('../../controllers/pagosController');
 const configuracionPagoController = require('../../controllers/configuracionPagoController');
 const logPagosController = require('../../controllers/logPagosController');
 const verificarAutenticacion = require('../../middlewares/verificarAutenticacion');
-
 
 //Obtener todos los colegios
 router.get('/getAllColegios', colegioController.getAllColegios);
@@ -86,7 +85,6 @@ router.post('/opinionesvaloraciones', opinionesValoracionesController.crearOpini
 
 // Rutas para Envíos
 router.post('/envios', enviosController.crearEnvio);
-
 
 
 // Rutas para Métodos de Pago
