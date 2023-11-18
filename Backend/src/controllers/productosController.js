@@ -1,5 +1,5 @@
 // productosController.js
-const db = require('../db/db'); 
+const db = require('../api/routes/db/db'); 
 
 exports.obtenerProductos = async (req, res) => {
     try {

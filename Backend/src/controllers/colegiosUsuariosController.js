@@ -1,5 +1,5 @@
 //colegiosUsuariosController.js
-const db = require('../db/db'); 
+const db = require('../api/routes/db/db'); 
 
 exports.asociarUsuarioConColegio = async (req, res) => {
     const { colegioId, usuarioId } = req.params;

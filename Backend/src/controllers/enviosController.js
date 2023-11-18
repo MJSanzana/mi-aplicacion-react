@@ -1,4 +1,4 @@
-const db = require('../db/db');
+const db = require('../api/routes/db/db'); 
 exports.crearEnvio = async (req, res) => {
     const { pedido_id, metodo_envio, costo, numero_seguimiento } = req.body;
     try {

@@ -1,6 +1,6 @@
   // ticketsController.js
-  const db = require('../db/db');
-  const { transporter, createMailOptions } = require('../../../server/email');
+  const db = require('../api/routes/db/db'); 
+  const { transporter, createMailOptions } = require('../server/email');
 
 exports.getTickets = async (req, res) => {
     try {

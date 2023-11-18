@@ -1,4 +1,4 @@
-const db = require('../db/db');
+const db = require('../api/routes/db/db'); 
 exports.agregarDetallePedido = async (req, res) => {
     const { pedido_id, productoVariante_id, cantidad, precio } = req.body;
     try {

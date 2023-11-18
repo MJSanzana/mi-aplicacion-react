@@ -1,5 +1,5 @@
 // colegioController.js
-const db = require('../db/db'); 
+const db = require('../api/routes/db/db'); 
 
 exports.getAllColegios = async (req, res) => {
   try {

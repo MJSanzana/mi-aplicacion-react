@@ -1,5 +1,5 @@
 //proveedoresProductosController.js
-const db = require('../db/db');
+const db = require('../api/routes/db/db'); 
 
 exports.obtenerVariantes = async (req, res) => {
     try {

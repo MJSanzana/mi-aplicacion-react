@@ -1,4 +1,4 @@
-const db = require('../db/db');
+const db = require('../api/routes/db/db'); 
 exports.crearOpinionValoracion = async (req, res) => {
     const { usuario_id, producto_id, valoracion, comentario } = req.body;
     try {

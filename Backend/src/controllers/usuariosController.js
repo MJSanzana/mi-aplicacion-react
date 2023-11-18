@@ -1,5 +1,5 @@
 // usuariosController.js
-const db = require('../db/db');
+const db = require('../api/routes/db/db'); 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 

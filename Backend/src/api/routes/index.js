@@ -2,17 +2,23 @@
 const express = require('express');
 const router = express.Router();
 
-const colegioController = require('./controllers/colegioController');
-const colegiosUsuariosController = require('./controllers/colegiosUsuariosController');
-const productosController = require('./controllers/productosController');
-const productosVariantesController = require('./controllers/productosVariantesController');
-const proveedoresProductosController = require('./controllers/proveedoresProductosController');
-const ticketsController = require('./controllers/ticketsController');
-const usuariosController = require('./controllers/usuariosController'); 
-const pedidosController = require('./controllers/pedidosController');
-const detallePedidosController = require('./controllers/detallePedidosController');
-const opinionesValoracionesController = require('./controllers/opinionesValoracionesController');
-const enviosController = require('./controllers/enviosController');
+const colegioController = require('../../controllers/colegioController');
+const colegiosUsuariosController = require('../../controllers/colegiosUsuariosController');
+const productosController = require('../../controllers/productosController');
+const productosVariantesController = require('../../controllers/productosVariantesController');
+const proveedoresProductosController = require('../../controllers/proveedoresProductosController');
+const ticketsController = require('../../controllers/ticketsController');
+const usuariosController = require('../../controllers/usuariosController'); 
+const pedidosController = require('../../controllers/pedidosController');
+const detallePedidosController = require('../../controllers/detallePedidosController');
+const opinionesValoracionesController = require('../../controllers/opinionesValoracionesController');
+const enviosController = require('../../controllers/enviosController');
+const metodosPagoController = require('../../controllers/metodosPagoController');
+const pagosController = require('../../controllers/pagosController ');
+const configuracionPagoController = require('../../controllers/configuracionPagoController');
+const logPagosController = require('../../controllers/logPagosController');
+const verificarAutenticacion = require('../../middlewares/verificarAutenticacion');
+
 
 //Obtener todos los colegios
 router.get('/getAllColegios', colegioController.getAllColegios);
@@ -80,5 +86,23 @@ router.post('/opinionesvaloraciones', opinionesValoracionesController.crearOpini
 
 // Rutas para Envíos
 router.post('/envios', enviosController.crearEnvio);
+
+
+
+// Rutas para Métodos de Pago
+router.post('/metodospago', metodosPagoController.crearMetodoPago);
+router.get('/metodospago', metodosPagoController.obtenerMetodosPago);
+
+// Rutas para Pagos
+router.post('/pagos', pagosController.registrarPago);
+router.get('/pagos', pagosController.obtenerPagos);
+
+// Rutas para Configuración de Pagos
+router.post('/configuracionpago', configuracionPagoController.configurarProveedorPago);
+router.get('/configuracionpago', configuracionPagoController.obtenerConfiguracionPago);
+
+// Rutas para Log de Pagos
+router.post('/logpagos', logPagosController.registrarEventoPago);
+router.get('/logpagos', logPagosController.obtenerLogPagos);
 
 module.exports = router;

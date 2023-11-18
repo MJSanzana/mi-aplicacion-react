@@ -1,4 +1,4 @@
-const db = require('../db/db'); 
+const db = require('../api/routes/db/db'); 
 
 exports.crearPedido = async (req, res) => {
     const { usuario_id, total, metodo_pago } = req.body;
@@ -16,10 +16,17 @@ exports.crearPedido = async (req, res) => {
 exports.obtenerPedidosUsuario = async (req, res) => {
     const { usuario_id } = req.params;
     try {
-        const pedidos = await db.query('SELECT * FROM Pedidos WHERE Usuario_Id = ?', [usuario_id]);
+        const resultados = await db.query('SELECT * FROM Pedidos WHERE Usuario_Id = ?', [usuario_id]);
+        const pedidos = resultados.map(pedido => {
+            return {
+                ...pedido,
+                Total: pedido.Total.toFixed(3)  // Convierte el decimal a string con 3 decimales
+            };
+        });
         res.json(pedidos);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 
