@@ -5,7 +5,7 @@ exports.registrarEventoPago = async (req, res) => {
     const { pago_id, evento } = req.body;
     
     // Verificar si el usuario es administrador
-    if (req.usuario && req.usuario.TipoUsuario === 'administrador') {
+    if (req.usuario && req.usuario.TipoUsuario === 'Administrador') {
         try {
             const result = await db.query(
                 'INSERT INTO LogPagos (Pago_Id, Evento) VALUES (?, ?)',
@@ -23,7 +23,7 @@ exports.registrarEventoPago = async (req, res) => {
 
 exports.obtenerLogPagos = async (req, res) => {
     // Verificar si el usuario es administrador
-    if (req.usuario && req.usuario.TipoUsuario === 'administrador') {
+    if (req.usuario && req.usuario.TipoUsuario === 'Administrador') {
         try {
             const logPagos = await db.query('SELECT * FROM LogPagos');
             res.json(logPagos);

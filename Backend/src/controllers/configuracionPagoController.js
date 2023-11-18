@@ -1,16 +1,24 @@
-// controllers/configuracionPagoController.js
-const db = require('../api/routes/db/db'); 
+const db = require('../api/routes/db/db');
 const crypto = require('crypto');
 
 exports.configurarProveedorPago = async (req, res) => {
     const { proveedor, claveAPI_Publica, claveAPI_Privada } = req.body;
 
-    // Asegúrate de que solo los administradores puedan acceder a este controlador
+    // Comprobar que los valores de entrada son válidos
+    if (!proveedor || typeof claveAPI_Publica !== 'string' || typeof claveAPI_Privada !== 'string') {
+        return res.status(400).json({ error: 'Los datos de entrada son incorrectos.' });
+    }
 
-    // Cifrar las claves API antes de almacenarlas
-    const encryptedPublic = crypto.createCipheriv('aes-256-ctr', process.env.ENCRYPTION_KEY, Buffer.from(process.env.ENCRYPTION_IV));
-    const encryptedPrivate = crypto.createCipheriv('aes-256-ctr', process.env.ENCRYPTION_KEY, Buffer.from(process.env.ENCRYPTION_IV));
-    
+    // Generar una clave de encriptación aleatoria de 32 bytes (256 bits)
+    const encryptionKey = crypto.randomBytes(32);
+
+    // Generar un vector de inicialización (IV) aleatorio de 16 bytes (128 bits)
+    const encryptionIV = crypto.randomBytes(16);
+
+    // Cifrar las claves API utilizando la clave de encriptación y el IV generados
+    const encryptedPublic = crypto.createCipheriv('aes-256-ctr', encryptionKey, Buffer.from(encryptionIV));
+    const encryptedPrivate = crypto.createCipheriv('aes-256-ctr', encryptionKey, Buffer.from(encryptionIV));
+
     const publicAPI = encryptedPublic.update(claveAPI_Publica, 'utf8', 'hex') + encryptedPublic.final('hex');
     const privateAPI = encryptedPrivate.update(claveAPI_Privada, 'utf8', 'hex') + encryptedPrivate.final('hex');
 
@@ -25,9 +33,10 @@ exports.configurarProveedorPago = async (req, res) => {
     }
 };
 
+
 exports.obtenerConfiguracionPago = async (req, res) => {
     // Asegúrate de que solo los administradores puedan acceder a este controlador
-    
+
     try {
         const configuraciones = await db.query('SELECT * FROM ConfiguracionPago');
         // No devolver las claves API en la respuesta
