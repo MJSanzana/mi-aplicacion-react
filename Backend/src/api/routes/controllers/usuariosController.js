@@ -1,11 +1,11 @@
 // usuariosController.js
-const { query } = require('../db/db');
+const db = require('../db/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const results = await query('SELECT * FROM Usuarios');
+    const results = await db.query('SELECT * FROM Usuarios');
     if (results.length === 0) {
       return res.status(404).json({ message: 'No se encontraron usuarios.' });
     }
@@ -17,7 +17,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   try {
-    const results = await query('SELECT * FROM Usuarios WHERE Id = ?', [req.params.id]);
+    const results = await db.query('SELECT * FROM Usuarios WHERE Id = ?', [req.params.id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
@@ -45,7 +45,7 @@ exports.createUser = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(Contraseña, 10);
 
-    const newUser = await query('INSERT INTO Usuarios (NombreUsuario, Apellido, Email, Contraseña, TipoUsuario) VALUES (?, ?, ?, ?, ?)', [NombreUsuario, Apellido, Email, hashedPassword, TipoUsuario]);
+    const newUser = await db.query('INSERT INTO Usuarios (NombreUsuario, Apellido, Email, Contraseña, TipoUsuario) VALUES (?, ?, ?, ?, ?)', [NombreUsuario, Apellido, Email, hashedPassword, TipoUsuario]);
 
     function handleResponse(res, status, message, data = {}) {
       res.status(status).json({ message, ...data });
@@ -61,7 +61,7 @@ exports.loginUser = async (req, res) => {
   const { Email, Contraseña } = req.body;
 
   try {
-    const users = await query('SELECT * FROM Usuarios WHERE Email = ?', [Email]);
+    const users = await db.query('SELECT * FROM Usuarios WHERE Email = ?', [Email]);
 
     if (users.length === 0) {
       return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
@@ -85,6 +85,7 @@ exports.loginUser = async (req, res) => {
 
     res.json({ message: 'Inicio de sesión exitoso', userId: user.Id, token: token });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -107,12 +108,12 @@ exports.updateUser = async (req, res) => {
       hashedPassword = await bcrypt.hash(Contraseña, 10);
     } else {
       //obtener la contraseña actual
-      const [currentUser] = await query('SELECT Contraseña FROM Usuarios WHERE Id = ?', [req.params.id]);
+      const [currentUser] = await db.query('SELECT Contraseña FROM Usuarios WHERE Id = ?', [req.params.id]);
       hashedPassword = currentUser.Contraseña;
     }
 
-    await query('UPDATE Usuarios SET NombreUsuario = ?, Apellido = ?, Email = ?, Contraseña = ?, Perfil_Imagen = ?, Documento_Numero = ?, Celular_Numero = ?, Direccion = ?, Comuna = ? WHERE Id = ?', 
-                [NombreUsuario, Apellido, Email, hashedPassword, Perfil_Imagen, Documento_Numero, Celular_Numero, Direccion, Comuna, req.params.id]);
+    await db.query('UPDATE Usuarios SET NombreUsuario = ?, Apellido = ?, Email = ?, Contraseña = ?, Perfil_Imagen = ?, Documento_Numero = ?, Celular_Numero = ?, Direccion = ?, Comuna = ? WHERE Id = ?',
+      [NombreUsuario, Apellido, Email, hashedPassword, Perfil_Imagen, Documento_Numero, Celular_Numero, Direccion, Comuna, req.params.id]);
 
     res.json({ message: 'Usuario actualizado con éxito' });
   } catch (err) {
@@ -124,7 +125,7 @@ exports.deactivateUser = async (req, res) => {
   const userId = req.params.id;
   const { CreadoPor } = req.body;
   try {
-    const results = await query('INSERT INTO DesactivacionUsuario_Solicitud (Usuario_Id, CreadoPor) VALUES (?, ?)', [userId, CreadoPor]);
+    const results = await db.query('INSERT INTO DesactivacionUsuario_Solicitud (Usuario_Id, CreadoPor) VALUES (?, ?)', [userId, CreadoPor]);
     res.json({ message: 'Solicitud de desactivación creada con éxito', solicitudId: results.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -135,7 +136,7 @@ exports.reactivateUser = async (req, res) => {
   const userId = req.params.id;
   const { CreadoPor } = req.body;
   try {
-    const results = await query('INSERT INTO ReactivacionUsuario_Solicitud (Usuario_Id, CreadoPor) VALUES (?, ?)', [userId, CreadoPor]);
+    const results = await db.query('INSERT INTO ReactivacionUsuario_Solicitud (Usuario_Id, CreadoPor) VALUES (?, ?)', [userId, CreadoPor]);
     res.json({ message: 'Solicitud de reactivación creada con éxito', solicitudId: results.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -1,21 +1,20 @@
 const express = require('express');
-const app = express();
-app.use(express.json());
+const router = express.Router(); // Deberías usar 'router' en lugar de 'app'
 
 const productosController = require('./controllers/productosController');
 const productosVariantesController = require('./controllers/productosVariantesController');
 const proveedoresProductosController = require('./controllers/proveedoresProductosController');
 
-
 // Rutas para Productos
-app.get('/productos', productosController.obtenerProductos);
-app.post('/productos', productosController.crearProducto);
-// Rutas para ProductosVariantes
-app.get('/productosvariantes', productosVariantesController.obtenerVariantes);
-app.post('/api/productosvariantes', productosVariantesController.crearVariante);
+router.get('/Obtener', productosController.obtenerProductos);
+router.post('/CreateProducts', productosController.crearProducto);
 
+// Rutas para ProductosVariantes
+router.get('/productosvariantes', productosVariantesController.obtenerVariantes);
+router.post('/productosvariantes', productosVariantesController.crearVariante); 
 
 // Rutas para ProveedoresProductos
-app.get('/proveedoresproductos', proveedoresProductosController.obtenerProveedoresProductos);
-app.post('/proveedoresproductos', proveedoresProductosController.crearProveedorProducto);
+router.get('/proveedoresproductos', proveedoresProductosController.obtenerProveedoresProductos);
+router.post('/proveedoresproductos', proveedoresProductosController.crearProveedorProducto);
 
+module.exports = router; 
