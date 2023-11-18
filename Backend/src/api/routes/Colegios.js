@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const colegioController = require('./controllers/colegioController');
 
-router.get('/colegios', colegioController.getAllColegios);
+router.get('/busqueda', colegioController.getAllColegios);
 router.post('/create', colegioController.createColegio);
 
 module.exports = router;
