@@ -93,7 +93,7 @@ router.get('/metodospago', metodosPagoController.obtenerMetodosPago);
 
 // Rutas para Pagos
 router.post('/pagos', pagosController.registrarPago);
-router.get('/pagos', pagosController.obtenerPagos);
+router.get('/pagos', verificarAutenticacion, pagosController.obtenerPagos);
 
 // Rutas para Configuración de Pagos
 router.post('/configuracionpago', configuracionPagoController.configurarProveedorPago);

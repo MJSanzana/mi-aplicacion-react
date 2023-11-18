@@ -1,5 +1,5 @@
 // usuariosController.js
-const db = require('../api/routes/db/db'); 
+const db = require('../api/routes/db/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -50,7 +50,7 @@ exports.createUser = async (req, res) => {
     function handleResponse(res, status, message, data = {}) {
       res.status(status).json({ message, ...data });
     }
-    handleResponse(res, 201, 'Usuario creado con éxito', { userId: newUser.insertId });
+    handleResponse(res, 200, 'Usuario creado con éxito', { userId: newUser.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -79,11 +79,11 @@ exports.loginUser = async (req, res) => {
     if (!jwtSecret) {
       return res.status(500).json({ message: 'Error interno del servidor' });
     }
-
     // Firmar el token JWT si la contraseña es correcta
-    const token = jwt.sign({ id: user.ID }, jwtSecret, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.Id }, jwtSecret, { expiresIn: '4h' });
 
-    res.json({ message: 'Inicio de sesión exitoso', userId: user.Id, token: token });
+
+    res.json({ message: 'Inicio de sesión exitoso', userId: user.Id, token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

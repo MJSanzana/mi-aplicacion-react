@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const db = require('../api/routes/db/db');
 const jwt = require('jsonwebtoken'); 
+const verificarAutenticacion = require('../middlewares/verificarAutenticacion');
 
 
 // Configuración de la app
