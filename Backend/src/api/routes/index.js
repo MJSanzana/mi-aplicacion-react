@@ -7,8 +7,12 @@ const colegiosUsuariosController = require('./controllers/colegiosUsuariosContro
 const productosController = require('./controllers/productosController');
 const productosVariantesController = require('./controllers/productosVariantesController');
 const proveedoresProductosController = require('./controllers/proveedoresProductosController');
-const ticketsController = require('../routes/controllers/ticketsController');
-const usuariosController = require('../routes/controllers/usuariosController'); 
+const ticketsController = require('./controllers/ticketsController');
+const usuariosController = require('./controllers/usuariosController'); 
+const pedidosController = require('./controllers/pedidosController');
+const detallePedidosController = require('./controllers/detallePedidosController');
+const opinionesValoracionesController = require('./controllers/opinionesValoracionesController');
+const enviosController = require('./controllers/enviosController');
 
 //Obtener todos los colegios
 router.get('/getAllColegios', colegioController.getAllColegios);
@@ -63,5 +67,18 @@ router.post('/deactivate/:id', usuariosController.deactivateUser);
 
 // Ruta para reactivar un usuario
 router.post('/reactivate/:id', usuariosController.reactivateUser); 
+
+// Rutas para Pedidos
+router.post('/pedidos', pedidosController.crearPedido);
+router.get('/usuarios/:usuario_id/pedidos', pedidosController.obtenerPedidosUsuario);
+
+// Rutas para Detalle de Pedidos
+router.post('/detallepedidos', detallePedidosController.agregarDetallePedido);
+
+// Rutas para Opiniones y Valoraciones
+router.post('/opinionesvaloraciones', opinionesValoracionesController.crearOpinionValoracion);
+
+// Rutas para Envíos
+router.post('/envios', enviosController.crearEnvio);
 
 module.exports = router;
