@@ -17,7 +17,7 @@ app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
 
 // Servir archivos estáticos desde el directorio 'uploads'
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configuración de CORS
 app.use(cors({

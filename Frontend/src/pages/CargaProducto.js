@@ -148,7 +148,8 @@ function CargaProducto() {
                 precio: precio,
                 imagen: imagen,
                 genero: genero,
-                estado: estado
+                estado: estado,
+                aprobado: aprobado
             };
 
             try {
@@ -228,7 +229,7 @@ function CargaProducto() {
         }
     };
     
-    
+
     return (
         <div className="container my-5">
             <div className="row justify-content-center">

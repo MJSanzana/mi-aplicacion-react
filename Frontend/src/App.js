@@ -13,6 +13,8 @@ import ProviderPage from './components/ProviderPage';
 import SupportPage from './components/SupportPage';
 import Login from './components/Login';
 import CargaProducto from './pages/CargaProducto';
+//import Colegios from './pages/Colegios';
+import UpProducto from './pages/UpProducto';
 
 function App() {
   return (
@@ -22,7 +24,9 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/pagina-usuario" element={<UserPage />} />
+           {/*<Route path="subpagina1" element={<Colegios />} />*/}
         <Route path="/pagina-administrador" element={<AdminPage />} />
+            <Route path="subpagina1" element={<UpProducto />} />
         <Route path="/pagina-proveedor" element={<ProviderPage />} />
           <Route path="subpagina1" element={<CargaProducto />} />
         <Route path="/pagina-soporte" element={<SupportPage />} />

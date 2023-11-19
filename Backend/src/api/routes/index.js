@@ -38,6 +38,7 @@ router.get('/colegios/:colegioId/usuarios', colegiosUsuariosController.obtenerUs
 router.get('/ObtenerProductos', productosController.obtenerProductos);
 router.post('/CreateProducts', productosController.crearProducto);
 router.put('/aprobado/:id', productosController.updateProductApproval);
+router.get('/productos/pendientes', productosController.getProductosPendientes);
 
 // Rutas para ProductosVariantes
 router.get('/productosvariantes', productosVariantesController.obtenerVariantes);
