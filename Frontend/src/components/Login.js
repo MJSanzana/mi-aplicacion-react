@@ -1,10 +1,11 @@
 // Login.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
 import Footer from '../pages/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link } from 'react-router-dom'; // Importa Link si aún no lo has hecho.
+import { Link } from 'react-router-dom';
 
 function Login() {
     const [Email, setEmail] = useState('');
@@ -13,9 +14,12 @@ function Login() {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
 
+    const { login } = useContext(AuthContext); // Asegúrate de importar useContext
+
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     }
+
     const handleLogin = async (e) => {
         e.preventDefault();
 
@@ -29,13 +33,18 @@ function Login() {
             setError("La contraseña es obligatoria.");
             return;
         }
+
         try {
-            const response = await axios.post('http://localhost:5000/api/Login', { Email, Contraseña });
+            const response = await axios.post('http://localhost:5000/api/Login', { Email, Contraseña: password });
             if (response.status === 200 && response.data && response.data.token) {
-                login(response.data.token);
+                login({
+                    Id: response.data.Id,
+                    TipoUsuario: response.data.TipoUsuario,
+                    token: response.data.token
+                });
 
                 // Redirige basado en el tipo de usuario
-                switch (response.data.tipoUsuario) {
+                switch (response.data.TipoUsuario) {
                     case "Usuario":
                         navigate('/pagina-usuario');
                         break;
@@ -117,5 +126,4 @@ function Login() {
         </div>
     );
 }
-
 export default Login;
