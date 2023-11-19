@@ -11,14 +11,28 @@ exports.obtenerProductos = async (req, res) => {
 };
 
 exports.crearProducto = async (req, res) => {
-    const { nombre, descripcion, genero, precio, imagen, aprobado, estado, sku } = req.body;
+    const { nombre, descripcion, genero, precio, imagen, aprobado, estado } = req.body;
+
     try {
-        const result = await db.query('INSERT INTO Productos (Nombre, Descripcion, Genero, Precio, Imagen, Aprobado, Estado, SKU) VALUES (?, ?, ?, ?, ?, ?,  ?, ?)', [nombre, descripcion, genero, precio, imagen, aprobado, estado, sku]);
+        // Obtener el último SKU de la base de datos
+        const ultimoSKUResult = await db.query('SELECT SKU FROM Productos ORDER BY SKU DESC LIMIT 1');
+        let ultimoSKU = ultimoSKUResult[0] ? ultimoSKUResult[0].SKU : 'UNI00000';
+        let nuevoSKU = generarNuevoSKU(ultimoSKU);
+
+        // Insertar el nuevo producto con el nuevo SKU
+        const result = await db.query('INSERT INTO Productos (Nombre, Descripcion, Genero, Precio, Imagen, Aprobado, Estado, SKU) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [nombre, descripcion, genero, precio, imagen, aprobado, estado, nuevoSKU]);
+        
         res.status(200).json({ id: result.insertId });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
+function generarNuevoSKU(ultimoSKU) {
+    let numero = parseInt(ultimoSKU.replace('UNI', '')) + 1;
+    return 'UNI' + numero.toString().padStart(5, '0');
+}
+
 
 exports.updateProductApproval = async (req, res) => {
     const productId = req.params.id;

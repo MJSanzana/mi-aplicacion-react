@@ -1,153 +1,99 @@
-import React, { useState, useCallback, useContext } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import { AuthContext } from 'path-to-your-auth-context';
+import { AuthContext } from '../components/AuthContext';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-// Esta función formateará el número en el formato de moneda CLP
-function formatCurrencyToCLP(numberValue) {
-    return new Intl.NumberFormat('es-CL', {
-        style: 'currency',
-        currency: 'CLP',
-        minimumFractionDigits: 0
-    }).format(numberValue);
-}
-
-const Producto = () => {
+function Producto() {
     const [formData, setFormData] = useState({
-        nombre: '',
-        descripcion: '',
-        precio: '',
-        imagen: '',
-        aprobado: '0',
-        genero: '',
-        estado: 'activo',
-        tallasCantidades: [{ talla: '', cantidad: 0 }],
+        Nombre: '',
+        Descripcion: '',
+        Genero: '',
+        Precio: '',
+        Imagen: null,
+        Aprobado: '0',
+        Estado: 'activo',
+        tallasCantidades: [{ Talla: '', Cantidad: 0 }],
     });
-    const [file, setFile] = useState(null); // Estado para el archivo de imagen
+    const [productoID, setProductoID] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [modalText, setModalText] = useState('');
-    const [productoEnviado, setProductoEnviado] = useState(false);
-    const [productoID, setProductoID] = useState(null);
-    const [displayPrecio, setDisplayPrecio] = useState('');
-
     const { usuario } = useContext(AuthContext);
-    const idProveedor = usuario ? usuario.id : null;
+    const IdProveedor = usuario ? usuario.Id : null;
 
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-    };
-
-
-    const handlePrecioBlur = (e) => {
-        const { value } = e.target;
-        const numericValue = parseFloat(value.replace(/\./g, '').replace('$', '')) || 0;
-        const formattedValue = formatCurrencyToCLP(numericValue);
-
-        setDisplayPrecio(formattedValue);
-        setFormData((prevState) => ({
-            ...prevState,
-            precio: numericValue
-        }));
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        if (name === "precio") {
-            setDisplayPrecio(value.replace(/[^\d]/g, ''));
+    // Función para manejar los cambios en los campos del formulario
+    const handleChange = (e) => {
+        const { name, value, type, files } = e.target;
+        if (type === 'file') {
+            setFormData({ ...formData, imagen: files[0] });
         } else {
-            setFormData((prevState) => ({
-                ...prevState,
-                [name]: value
-            }));
+            setFormData({ ...formData, [name]: value });
         }
     };
 
-    const handlePrecioFocus = (e) => {
-        const numericValue = parseFloat(displayPrecio.replace(/\./g, '').replace('$', '')) || '';
-        setDisplayPrecio(numericValue.toString());
+    // Funciones para manejar las tallas y cantidades
+    const handleTallaChange = (index, field, value) => {
+        const updatedTallas = formData.tallasCantidades.map((item, i) =>
+            i === index ? { ...item, [field]: value } : item
+        );
+        setFormData({ ...formData, tallasCantidades: updatedTallas });
     };
 
-    const handleTallaChange = useCallback((index, field, value) => {
-        let newValue = field === 'cantidad' ? parseInt(value) || 0 : value;
-        setFormData(prevState => ({
-            ...prevState,
-            tallasCantidades: prevState.tallasCantidades.map((item, i) =>
-                i === index ? { ...item, [field]: newValue } : item
-            )
-        }));
-    }, []);
+    const agregarTalla = () => {
+        setFormData({
+            ...formData,
+            tallasCantidades: [...formData.tallasCantidades, { talla: '', cantidad: 0 }]
+        });
+    };
 
-    const agregarTalla = useCallback(() => {
-        setFormData(prevState => ({
-            ...prevState,
-            tallasCantidades: [...prevState.tallasCantidades, { talla: '', cantidad: 0 }]
-        }));
-    }, []);
+    const eliminarTalla = (index) => {
+        setFormData({
+            ...formData,
+            tallasCantidades: formData.tallasCantidades.filter((_, i) => i !== index)
+        });
+    };
 
-    const eliminarTalla = useCallback((index) => {
-        setFormData(prevState => ({
-            ...prevState,
-            tallasCantidades: prevState.tallasCantidades.filter((_, i) => i !== index)
-        }));
-    }, []);
-
+    // Validación de campos
     const validateFields = () => {
-        const requiredFields = ['nombre', 'descripcion', 'precio', 'imagen', 'genero'];
-
-        const isValid = requiredFields.reduce((valid, field) => {
-            if (!formData[field]) {
-                setShowModal(true);
-                setModalText(`Por favor, llena el campo de ${field}.`);
-                return false;
-            }
-            return valid;
-        }, true);
-        if (isValid) {
-            formData.tallasCantidades.forEach((tc) => {
-                if (!tc.talla || tc.cantidad === '') {
-                    setShowModal(true);
-                    setModalText('Por favor, llena todos los campos de tallas y cantidades.');
-                    return false;
-                }
-            });
+        if (!formData.Nombre || !formData.Descripcion || !formData.Precio || !formData.Imagen || !formData.Genero) {
+            setShowModal(true);
+            setModalText('Por favor, completa todos los campos requeridos.');
+            return false;
         }
-        return isValid;
+        if (formData.tallasCantidades.some(tc => !tc.talla || tc.cantidad === 0)) {
+            setShowModal(true);
+            setModalText('Por favor, completa todos los campos de tallas y cantidades.');
+            return false;
+        }
+        return true;
     };
-    const handleSendProducto = async (event) => {
-        event.preventDefault();
-        if (validateFields()) {
-            const postFormData = new FormData();
-            postFormData.append('nombre', formData.nombre);
-            postFormData.append('descripcion', formData.descripcion);
-            postFormData.append('precio', formData.precio);
-            if (file) {
-                postFormData.append('imagen', file);
+
+    // Función para enviar el producto
+    const handleSendProducto = async () => {
+        if (!validateFields()) return;
+
+        const postFormData = new FormData();
+        Object.keys(formData).forEach(key => {
+            if (key !== 'tallasCantidades') {
+                postFormData.append(key, formData[key]);
             }
-            // Añade otros campos necesarios aquí, si los hay
+        });
 
-            try {
-                const response = await axios.post('http://localhost:5000/api/Createproducts', postFormData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
+        try {
+            const response = await axios.post('http://localhost:5000/api/Createproducts', postFormData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
 
-                const productoId = response.data.id;
-                if (productoId) {
-                    setProductoID(productoId);
-                    setProductoEnviado(true);
-                    setShowModal(true);
-                    setModalText('Producto guardado exitosamente.');
-                    await asociarProductoConProveedor(productoId, idProveedor);
-                } else {
-                    setShowModal(true);
-                    setModalText('Error en el servidor, no se recibió el ID del producto.');
-                }
-            } catch (error) {
-                console.error("Error al enviar el producto:", error);
+            if (response.data && response.data.Id) {
+                setProductoID(response.data.Id);
                 setShowModal(true);
-                setModalText('Error al enviar el producto. Por favor, intenta de nuevo.');
+                setModalText('Producto guardado exitosamente.');
+                await asociarProductoConProveedor(response.data.Id, IdProveedor);
+            } else {
+                throw new Error('ID del producto no recibido');
             }
+        } catch (error) {
+            setShowModal(true);
+            setModalText(error.message || 'Error al enviar el producto. Por favor, intenta de nuevo.');
         }
     };
 
@@ -167,27 +113,20 @@ const Producto = () => {
     const handleSendTallasYCantidades = async (event) => {
         event.preventDefault();
         if (!productoID || formData.tallasCantidades.length === 0) {
-            // Manejar el caso donde no hay tallas y cantidades para enviar o no hay ID de producto
             setShowModal(true);
             setModalText('Primero debes guardar un producto y luego agregar tallas y cantidades.');
             return;
         }
-
         try {
-            const tallasCantidadesData = {
-                tallas_cantidades: formData.tallasCantidades
-            };
-            const response = await axios.post(`http://localhost:5000/api/clients/TallasCantidades/${productoID}`, tallasCantidadesData, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+            const tallasCantidadesData = { tallas_cantidades: formData.tallasCantidades };
+            const response = await axios.post(`http://localhost:5000/api/productosvariantes/${productoID}`, tallasCantidadesData, {
+                headers: { 'Content-Type': 'application/json' }
             });
 
             if (response.status === 200) {
                 setShowModal(true);
                 setModalText('Tallas y cantidades agregadas con éxito.');
             } else {
-                // Manejar otros códigos de estado
                 setShowModal(true);
                 setModalText('Respuesta inesperada del servidor.');
             }
@@ -197,6 +136,7 @@ const Producto = () => {
             setModalText('Error al enviar tallas y cantidades. Por favor, intenta de nuevo.');
         }
     };
+
     return (
         <div className="container my-5">
             <div className="row justify-content-center">
@@ -205,61 +145,44 @@ const Producto = () => {
                     <form onSubmit={handleSendProducto} encType="multipart/form-data" className="shadow p-4 rounded bg-white">
                         <div className="form-group mb-3">
                             <label htmlFor="Nombre">Nombre:</label>
-                            <input type="text" className="form-control" name="nombre" onChange={handleInputChange} />
+                            <input type="text" className="form-control" name="Nombre" onChange={handleInputChange} />
                         </div>
 
                         <div className="form-group mb-3">
                             <label htmlFor="Descripcion">Descripción:</label>
                             <textarea className="form-control" name="descripcion" onChange={handleInputChange} />
                         </div>
-
-                        <div className="form-group mb-3">
-                            <label htmlFor="runConfeccionista">RUT Proveedor:</label>
-                            <input
-                                type="text" className="form-control" name="runConfeccionista" value={formData.runConfeccionista} onChange={handleInputChange} onBlur={handleRunBlur} required />
-                        </div>
-
                         <div className="form-group mb-3">
                             <label htmlFor="genero">Género:</label>
-                            <select className="form-control" name="genero" value={formData.genero} onChange={handleInputChange} required >
+                            <select className="form-control" name="genero" value={formData.Genero} onChange={handleInputChange} required >
                                 <option value="">Seleccione un género</option>
                                 <option value="Masculino">Masculino</option>
                                 <option value="Femenino">Femenino</option>
                                 <option value="Unisex">Unisex</option>
                             </select>
                         </div>
-
                         <div className="form-row">
                             <div className="form-group col-md-4">
-                                <label htmlFor="precio">Precio:</label>
+                                <label htmlFor="Precio">Precio:</label>
                                 <input
                                     type="text"
                                     className="form-control"
-                                    id="precio"
-                                    name="precio"
-                                    value={displayPrecio}
+                                    id="Precio"
+                                    name="Precio"
                                     onChange={handleInputChange}
-                                    onBlur={handlePrecioBlur}
-                                    onFocus={handlePrecioFocus}
                                 />
                             </div>
-
                             <div className="form-group col-md-8">
                                 <label htmlFor="Imagen">Imagen:</label>
-                                <input type="file" className="form-control" name="imagen" onChange={handleInputChange} required />
-                            </div>
-
-                            <div className="form-group col mb-4">
-                                <label htmlFor="Establecimiento">Establecimiento:</label>
-                                <input type="text" className="form-control" name="establecimiento" value={formData.establecimiento} onChange={handleInputChange} required />
+                                <input type="file" className="form-control" name="Imagen" onChange={handleInputChange} required />
                             </div>
                         </div>
                         <div className="form-row">
                             <div className="col text-center">
-                                <button type="button" className="btn btn-primary btn-lg4" onClick={handleSendProducto}>Guardar Producto</button>
+                            <button type="submit" className="btn btn-primary btn-lg4">Guardar Producto</button>
                             </div>
                         </div>
-                    </form> {/* Aquí se cierra el form */}
+                    </form>
                     {/* Modal aquí */}
                     {showModal && (
                         <div className="modal d-block" tabIndex="-1">
@@ -279,7 +202,6 @@ const Producto = () => {
                             </div>
                         </div>
                     )}
-
                     <div>
                         <hr />
                         <h3 className="mt-3 mb-4">Tallas y Cantidades</h3>
@@ -345,7 +267,6 @@ const Producto = () => {
                                 </div>
                             </div>
                         </form>
-
                     </div>
                 </div>
             </div>
