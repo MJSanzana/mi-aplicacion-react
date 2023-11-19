@@ -1,5 +1,5 @@
 // Login.js
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
@@ -11,14 +11,37 @@ function Login() {
     const [Email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
 
-    const { login } = useContext(AuthContext); // Asegúrate de importar useContext
+    const { usuario, login } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    // useEffect colocado en el nivel superior del componente
+    useEffect(() => {
+        console.log('useEffect usuario:', usuario); // Para depuración
+        if (usuario) {
+            switch (usuario.TipoUsuario) {
+                case "Usuario":
+                    navigate('/pagina-usuario');
+                    break;
+                case "Administrador":
+                    navigate('/pagina-administrador');
+                    break;
+                case "Proveedor":
+                    navigate('/pagina-proveedor');
+                    break;
+                case "Soporte":
+                    navigate('/pagina-soporte');
+                    break;
+                default:
+                    navigate('/'); // Redirige al Home si no coincide con ningún tipo
+            }
+        }
+    }, [usuario, navigate]);
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
-    }
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -38,35 +61,19 @@ function Login() {
             const response = await axios.post('http://localhost:5000/api/Login', { Email, Contraseña: password });
             if (response.status === 200 && response.data && response.data.token) {
                 login({
-                    Id: response.data.Id,
-                    TipoUsuario: response.data.TipoUsuario,
+                    userId: response.data.userId,
+                    tipoUsuario: response.data.tipoUsuario,
                     token: response.data.token
                 });
+                console.log(usuario); // Agrega esto para depuración
 
-                // Redirige basado en el tipo de usuario
-                switch (response.data.TipoUsuario) {
-                    case "Usuario":
-                        navigate('/pagina-usuario');
-                        break;
-                    case "Administrador":
-                        navigate('/pagina-administrador');
-                        break;
-                    case "Proveedor":
-                        navigate('/pagina-proveedor');
-                        break;
-                    case "Soporte":
-                        navigate('/pagina-soporte');
-                        break;
-                    default:
-                        navigate('/Home'); // Redirige al Home si no coincide con ningún tipo
-                }
             } else if (response.status === 400 && response.data.message) {
                 setError(response.data.message);
             }
         } catch (err) {
             setError(err.response && err.response.data && err.response.data.message ? err.response.data.message : 'Error al intentar iniciar sesión. Por favor intenta nuevamente.');
         }
-    }
+    };
     return (
         <div>
             <main>

@@ -61,6 +61,7 @@ exports.loginUser = async (req, res) => {
   const { Email, Contraseña } = req.body;
 
   try {
+    // Asumiendo que 'TipoUsuario' es una columna en tu tabla 'Usuarios'
     const users = await db.query('SELECT * FROM Usuarios WHERE Email = ?', [Email]);
 
     if (users.length === 0) {
@@ -74,16 +75,15 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
     }
 
-    // Asegúrate de tener una clave secreta para firmar el token
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       return res.status(500).json({ message: 'Error interno del servidor' });
     }
-    // Firmar el token JWT si la contraseña es correcta
+
     const token = jwt.sign({ id: user.Id }, jwtSecret, { expiresIn: '4h' });
 
-
-    res.json({ message: 'Inicio de sesión exitoso', userId: user.Id, token });
+    // Agregar el tipo de usuario a la respuesta
+    res.json({ message: 'Inicio de sesión exitoso', userId: user.Id, token, tipoUsuario: user.TipoUsuario });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
