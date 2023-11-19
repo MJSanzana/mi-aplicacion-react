@@ -1,115 +1,181 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../components/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function Producto() {
+function formatCurrencyToCLP(numberValue) {
+    return new Intl.NumberFormat('es-CL', {
+        style: 'currency',
+        currency: 'CLP',
+        minimumFractionDigits: 0
+    }).format(numberValue);
+}
+
+const asociarProductoConProveedor = async (productoId, idProveedor, setShowModal, setModalText) => {
+    if (!productoId || !idProveedor) {
+        console.error('Faltan el ID del producto o el ID del proveedor.');
+        setShowModal(true);
+        setModalText('Falta el ID del producto o del proveedor. Por favor, intenta de nuevo.');
+        return;
+    }
+
+    const data = {
+        producto_id: productoId,
+        proveedor_id: idProveedor
+    };
+
+    try {
+        const response = await axios.post('http://localhost:5000/api/proveedoresproductos', data);
+        if (response.status === 200) {
+            console.log('Producto asociado con éxito al proveedor.');
+        } else {
+            console.error('Respuesta inesperada del servidor al asociar producto con proveedor.');
+            setShowModal(true);
+            setModalText('Hubo un problema al asociar el producto con el proveedor. Por favor, intenta de nuevo.');
+        }
+    } catch (error) {
+        console.error('Error al asociar el producto con el proveedor:', error);
+        setShowModal(true);
+        setModalText('Error al intentar asociar el producto con el proveedor. Por favor, verifica tu conexión y vuelve a intentarlo.');
+    }
+};
+
+function CargaProducto() {
+    const { usuario } = useContext(AuthContext);
+    const idProveedor = usuario ? usuario.userId : null;
+
     const [formData, setFormData] = useState({
-        Nombre: '',
-        Descripcion: '',
-        Genero: '',
-        Precio: '',
-        Imagen: null,
-        Aprobado: '0',
-        Estado: 'activo',
-        tallasCantidades: [{ Talla: '', Cantidad: 0 }],
+        nombre: '',
+        descripcion: '',
+        genero: '',
+        precio: '',
+        imagen: null,
+        aprobado: 0,
+        estado: 'activo',
+        tallasCantidades: [{ talla: '', cantidad: 0 }],
     });
+
     const [productoID, setProductoID] = useState(null);
+    const [productoEnviado, setProductoEnviado] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalText, setModalText] = useState('');
-    const { usuario } = useContext(AuthContext);
-    const IdProveedor = usuario ? usuario.Id : null;
+    const [displayPrecio, setDisplayPrecio] = useState('');
+    const [isProductFormDisabled, setIsProductFormDisabled] = useState(false);
 
-    // Función para manejar los cambios en los campos del formulario
-    const handleChange = (e) => {
-        const { name, value, type, files } = e.target;
-        if (type === 'file') {
-            setFormData({ ...formData, imagen: files[0] });
+    const handlePrecioBlur = (e) => {
+        const { value } = e.target;
+        const numericValue = parseFloat(value.replace(/\./g, '').replace('$', '')) || 0;
+        const formattedValue = formatCurrencyToCLP(numericValue);
+
+        setDisplayPrecio(formattedValue);
+        setFormData((prevState) => ({
+            ...prevState,
+            precio: numericValue
+        }));
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        if (name === "precio") {
+            setDisplayPrecio(value.replace(/[^\d]/g, ''));
         } else {
-            setFormData({ ...formData, [name]: value });
+            setFormData((prevState) => ({
+                ...prevState,
+                [name]: value
+            }));
         }
     };
-
-    // Funciones para manejar las tallas y cantidades
-    const handleTallaChange = (index, field, value) => {
-        const updatedTallas = formData.tallasCantidades.map((item, i) =>
-            i === index ? { ...item, [field]: value } : item
-        );
-        setFormData({ ...formData, tallasCantidades: updatedTallas });
+    const handlePrecioFocus = (e) => {
+        const numericValue = parseFloat(displayPrecio.replace(/\./g, '').replace('$', '')) || '';
+        setDisplayPrecio(numericValue.toString());
     };
 
-    const agregarTalla = () => {
-        setFormData({
-            ...formData,
-            tallasCantidades: [...formData.tallasCantidades, { talla: '', cantidad: 0 }]
-        });
-    };
+    const handleTallaChange = useCallback((index, field, value) => {
+        let newValue = field === 'cantidad' ? parseInt(value) || 0 : value;
+        setFormData(prevState => ({
+            ...prevState,
+            tallasCantidades: prevState.tallasCantidades.map((item, i) =>
+                i === index ? { ...item, [field]: newValue } : item
+            )
+        }));
+    }, []);
 
-    const eliminarTalla = (index) => {
-        setFormData({
-            ...formData,
-            tallasCantidades: formData.tallasCantidades.filter((_, i) => i !== index)
-        });
-    };
+    const agregarTalla = useCallback(() => {
+        setFormData(prevState => ({
+            ...prevState,
+            tallasCantidades: [...prevState.tallasCantidades, { talla: '', cantidad: 0 }]
+        }));
+    }, []);
+
+
+    const eliminarTalla = useCallback((index) => {
+        setFormData(prevState => ({
+            ...prevState,
+            tallasCantidades: prevState.tallasCantidades.filter((_, i) => i !== index)
+        }));
+    }, []);
 
     // Validación de campos
     const validateFields = () => {
-        if (!formData.Nombre || !formData.Descripcion || !formData.Precio || !formData.Imagen || !formData.Genero) {
-            setShowModal(true);
-            setModalText('Por favor, completa todos los campos requeridos.');
-            return false;
-        }
-        if (formData.tallasCantidades.some(tc => !tc.talla || tc.cantidad === 0)) {
-            setShowModal(true);
-            setModalText('Por favor, completa todos los campos de tallas y cantidades.');
-            return false;
-        }
-        return true;
-    };
-
-    // Función para enviar el producto
-    const handleSendProducto = async () => {
-        if (!validateFields()) return;
-
-        const postFormData = new FormData();
-        Object.keys(formData).forEach(key => {
-            if (key !== 'tallasCantidades') {
-                postFormData.append(key, formData[key]);
-            }
-        });
-
-        try {
-            const response = await axios.post('http://localhost:5000/api/Createproducts', postFormData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-
-            if (response.data && response.data.Id) {
-                setProductoID(response.data.Id);
+        const requiredFields = ['nombre', 'descripcion', 'precio', 'imagen', 'genero'];
+        const isValid = requiredFields.reduce((valid, field) => {
+            if (!formData[field]) {
                 setShowModal(true);
-                setModalText('Producto guardado exitosamente.');
-                await asociarProductoConProveedor(response.data.Id, IdProveedor);
-            } else {
-                throw new Error('ID del producto no recibido');
+                setModalText(`Por favor, llena el campo de ${field}.`);
+                return false;
             }
-        } catch (error) {
-            setShowModal(true);
-            setModalText(error.message || 'Error al enviar el producto. Por favor, intenta de nuevo.');
+            return valid;
+        }, true);
+        if (isValid) {
+            formData.tallasCantidades.forEach((tc) => {
+                if (!tc.talla || tc.cantidad === '') {
+                    setShowModal(true);
+                    setModalText('Por favor, llena todos los campos de tallas y cantidades.');
+                    return false;
+                }
+            });
         }
+        return isValid;
     };
+    // Función para enviar el producto
+    const handleSendProducto = async (event) => {
+        event.preventDefault();
+        if (validateFields()) {
+            const { nombre, descripcion, precio, imagen, genero, estado } = formData;
+            const jsonToSend = {
+                nombre: nombre,
+                descripcion: descripcion,
+                precio: precio,
+                imagen: imagen,
+                genero: genero,
+                estado: estado
+            };
 
-    const asociarProductoConProveedor = async (productoId, proveedorId) => {
-        const data = {
-            producto_id: productoId,
-            proveedor_id: proveedorId
-        };
-        try {
-            await axios.post('http://localhost:5000/api/proveedoresproductos', data);
-            // Manejo de la respuesta exitosa
-        } catch (error) {
-            // Manejo de errores
+            try {
+                const response = await axios.post('http://localhost:5000/api/Createproducts', jsonToSend, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const productoId = response.data.id; // Asumiendo que la respuesta del servidor incluye el ID
+                if (productoId) {
+                    setProductoID(productoId);
+                    setProductoEnviado(true);
+                    setShowModal(true);
+                    setModalText('Producto guardado exitosamente. Ahora puedes agregar tallas y cantidades.');
+                    setIsProductFormDisabled(true);
+
+                    await asociarProductoConProveedor(productoId, idProveedor, setShowModal, setModalText);
+                } else {
+                    throw new Error('ID del producto no recibido');
+                }
+            } catch (error) {
+                setShowModal(true);
+                setModalText(error.message || 'Error al enviar el producto. Por favor, intenta de nuevo.');
+            }
         }
     };
-    // Esta función ahora solo enviará las tallas y cantidades, asumiendo que el productoID ya está establecido.
     const handleSendTallasYCantidades = async (event) => {
         event.preventDefault();
         if (!productoID || formData.tallasCantidades.length === 0) {
@@ -118,14 +184,39 @@ function Producto() {
             return;
         }
         try {
-            const tallasCantidadesData = { tallas_cantidades: formData.tallasCantidades };
-            const response = await axios.post(`http://localhost:5000/api/productosvariantes/${productoID}`, tallasCantidadesData, {
-                headers: { 'Content-Type': 'application/json' }
+            // Asegúrate de que las claves en el objeto que envías coincidan con las expectativas del backend.
+            const tallasCantidadesData = {
+                producto_id: productoID, // Asumiendo que productoID es un número y no una cadena.
+                variantes: formData.tallasCantidades.map(tc => ({
+                    Talla: tc.talla,
+                    Cantidad: tc.cantidad
+                }))
+            };
+    
+            const response = await axios.post('http://localhost:5000/api/productosvariantes', tallasCantidadesData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
-
+    
             if (response.status === 200) {
                 setShowModal(true);
                 setModalText('Tallas y cantidades agregadas con éxito.');
+                
+                // Reinicia el formulario a su estado inicial aquí
+                setFormData({
+                    nombre: '',
+                    descripcion: '',
+                    genero: '',
+                    precio: '',
+                    imagen: null,
+                    aprobado: 0,
+                    estado: 'activo',
+                    tallasCantidades: [{ talla: '', cantidad: 0 }],
+                });
+                setDisplayPrecio('');
+                setProductoEnviado(false); // Si también deseas resetear esta parte del estado.
+    
             } else {
                 setShowModal(true);
                 setModalText('Respuesta inesperada del servidor.');
@@ -136,7 +227,8 @@ function Producto() {
             setModalText('Error al enviar tallas y cantidades. Por favor, intenta de nuevo.');
         }
     };
-
+    
+    
     return (
         <div className="container my-5">
             <div className="row justify-content-center">
@@ -145,7 +237,7 @@ function Producto() {
                     <form onSubmit={handleSendProducto} encType="multipart/form-data" className="shadow p-4 rounded bg-white">
                         <div className="form-group mb-3">
                             <label htmlFor="Nombre">Nombre:</label>
-                            <input type="text" className="form-control" name="Nombre" onChange={handleInputChange} />
+                            <input type="text" className="form-control" name="nombre" onChange={handleInputChange} />
                         </div>
 
                         <div className="form-group mb-3">
@@ -154,7 +246,7 @@ function Producto() {
                         </div>
                         <div className="form-group mb-3">
                             <label htmlFor="genero">Género:</label>
-                            <select className="form-control" name="genero" value={formData.Genero} onChange={handleInputChange} required >
+                            <select className="form-control" name="genero" value={formData.genero} onChange={handleInputChange} required >
                                 <option value="">Seleccione un género</option>
                                 <option value="Masculino">Masculino</option>
                                 <option value="Femenino">Femenino</option>
@@ -163,26 +255,30 @@ function Producto() {
                         </div>
                         <div className="form-row">
                             <div className="form-group col-md-4">
-                                <label htmlFor="Precio">Precio:</label>
+                                <label htmlFor="precio">Precio:</label>
                                 <input
                                     type="text"
                                     className="form-control"
-                                    id="Precio"
-                                    name="Precio"
+                                    id="precio"
+                                    name="precio"
+                                    value={displayPrecio}
                                     onChange={handleInputChange}
+                                    onBlur={handlePrecioBlur}
+                                    onFocus={handlePrecioFocus}
                                 />
                             </div>
+
                             <div className="form-group col-md-8">
                                 <label htmlFor="Imagen">Imagen:</label>
-                                <input type="file" className="form-control" name="Imagen" onChange={handleInputChange} required />
+                                <input type="file" className="form-control" name="imagen" onChange={handleInputChange} required />
                             </div>
                         </div>
                         <div className="form-row">
                             <div className="col text-center">
-                            <button type="submit" className="btn btn-primary btn-lg4">Guardar Producto</button>
+                            <button type="submit" className="btn btn-primary btn-lg4" disabled={isProductFormDisabled}>Guardar Producto</button>
                             </div>
                         </div>
-                    </form>
+                    </form> {/* Aquí se cierra el form */}
                     {/* Modal aquí */}
                     {showModal && (
                         <div className="modal d-block" tabIndex="-1">
@@ -202,6 +298,7 @@ function Producto() {
                             </div>
                         </div>
                     )}
+
                     <div>
                         <hr />
                         <h3 className="mt-3 mb-4">Tallas y Cantidades</h3>
@@ -273,4 +370,4 @@ function Producto() {
         </div>
     );
 }
-export default Producto;
+export default CargaProducto;

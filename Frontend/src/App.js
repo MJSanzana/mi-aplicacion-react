@@ -12,7 +12,7 @@ import AdminPage from './components/AdminPage';
 import ProviderPage from './components/ProviderPage';
 import SupportPage from './components/SupportPage';
 import Login from './components/Login';
-import SomeProviderSubPage from './pages/CargaProducto';
+import CargaProducto from './pages/CargaProducto';
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
         <Route path="/pagina-usuario" element={<UserPage />} />
         <Route path="/pagina-administrador" element={<AdminPage />} />
         <Route path="/pagina-proveedor" element={<ProviderPage />} />
-          <Route path="subpagina1" element={<SomeProviderSubPage />} />
+          <Route path="subpagina1" element={<CargaProducto />} />
         <Route path="/pagina-soporte" element={<SupportPage />} />
         {/* Puedes agregar más rutas según sea necesario */}
       </Routes>
