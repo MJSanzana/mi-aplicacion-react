@@ -1,13 +1,13 @@
 // Login.js
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import Footer from '../pages/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link } from 'react-router-dom';
+import {Button} from 'react-bootstrap';
 
-function Login() {
+function Login({ changeView }) {
     const [Email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
@@ -74,6 +74,11 @@ function Login() {
             setError(err.response && err.response.data && err.response.data.message ? err.response.data.message : 'Error al intentar iniciar sesión. Por favor intenta nuevamente.');
         }
     };
+
+    const navigateToRegister = () => {
+        changeView('Registro');
+    };
+
     return (
         <div>
             <main>
@@ -121,7 +126,7 @@ function Login() {
                                         <input className="btn btn-primary" type="submit" name="submit" value="Iniciar sesión" />
                                     </div>
                                     <div className="mt-3">
-                                        ¿Aún no tienes cuenta? <Link to="/Registro">Regístrate</Link>
+                                    ¿Aún no tienes cuenta? <Button variant="secondary" onClick={navigateToRegister}>Regístrate</Button>
                                     </div>
                                 </div>
                             </form>

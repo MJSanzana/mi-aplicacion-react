@@ -11,14 +11,12 @@ import UserPage from './components/UserPage';
 import AdminPage from './components/AdminPage';
 import ProviderPage from './components/ProviderPage';
 import SupportPage from './components/SupportPage';
-import Login from './components/Login';
 
 function App() {
   return (
     <AuthProvider>
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
         <Route path="/pagina-usuario" element={<UserPage />} />
         <Route path="/pagina-administrador" element={<AdminPage />} />
         <Route path="/pagina-proveedor" element={<ProviderPage />} />

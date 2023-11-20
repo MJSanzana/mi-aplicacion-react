@@ -5,6 +5,8 @@ import Colegios from '../pages/Colegios';
 import ShoppingCart from '../pages/ShoppingCart';
 import Home from './Home'
 import Login from './Login';
+import Registro from './Registro';
+import Nosotros from '../pages/Nosotros';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function UserPage() {
@@ -54,8 +56,7 @@ function UserPage() {
                     >
                         Carro
                     </NavLink>
-                </NavItem>
-            
+                </NavItem>      
             <NavItem>
                     <NavLink
                         active={currentView === 'Login'}
@@ -72,7 +73,9 @@ function UserPage() {
             {currentView === 'Producto' && <Producto />}
             {currentView === 'Colegios' && <Colegios />}
             {currentView === 'ShoppingCart' && <ShoppingCart />}
-            {currentView === 'Login' && <Login />}
+            {currentView === 'Login' && <Login changeView={changeView} />}
+            {currentView === 'Registro' && <Registro />}
+            {currentView === 'Nosotros' && <Nosotros />}
         </div>
     );
 }
