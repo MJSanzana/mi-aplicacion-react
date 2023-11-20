@@ -74,7 +74,7 @@ function UserPage() {
             {currentView === 'Colegios' && <Colegios />}
             {currentView === 'ShoppingCart' && <ShoppingCart />}
             {currentView === 'Login' && <Login changeView={changeView} />}
-            {currentView === 'Registro' && <Registro />}
+            {currentView === 'Registro' && <Registro changeView={changeView} />}
             {currentView === 'Nosotros' && <Nosotros />}
         </div>
     );
