@@ -96,24 +96,43 @@ const Productos = ({ changeView }) => {
   );
 };
 
-const ProductoModal = ({ show, onHide, producto, onAddToCart, changeView }) => {
+const ProductoModal = ({ show, onHide, producto, changeView }) => {
+  // Usar un estado local para manejar la cantidad del producto en el modal.
   const [cantidad, setCantidad] = useState(1);
 
   useEffect(() => {
-    if (show) {
-      setCantidad(1);
+    // Cada vez que se muestra el modal, actualiza la cantidad según el carrito.
+    const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
+    const productoEnCarrito = carrito.find(item => item.Id === producto.Id);
+    setCantidad(productoEnCarrito ? productoEnCarrito.cantidad : 1);
+  }, [show, producto.Id]);
+
+  const actualizarCarrito = (delta) => {
+    const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
+    const index = carrito.findIndex((item) => item.Id === producto.Id);
+    let nuevaCantidad = cantidad + delta;
+
+    if (index !== -1) {
+      if (nuevaCantidad > 0) {
+        carrito[index].cantidad = nuevaCantidad;
+      } else {
+        carrito.splice(index, 1);
+      }
+    } else if (nuevaCantidad > 0) {
+      carrito.push({ ...producto, cantidad: nuevaCantidad });
     }
-  }, [show]);
+
+    localStorage.setItem('cartItems', JSON.stringify(carrito));
+    setCantidad(nuevaCantidad > 0 ? nuevaCantidad : 1);
+  };
 
   const incrementarCantidad = () => {
-    if (cantidad < 20) {
-      setCantidad(cantidad + 1);
-    }
+    actualizarCarrito(1);
   };
 
   const decrementarCantidad = () => {
     if (cantidad > 1) {
-      setCantidad(cantidad - 1);
+      actualizarCarrito(-1);
     }
   };
 
