@@ -31,3 +31,14 @@ code {
   display: block;   /* Asegura que la imagen no tenga espacio adicional debajo */
   margin: 0 auto;   /* Centra la imagen horizontalmente */
 }
+.colegio-imagen {
+  max-width: 150px;
+  max-height: 150px;
+  object-fit: contain;
+
+}
+.card-img-top {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

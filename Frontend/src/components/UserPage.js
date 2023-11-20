@@ -3,10 +3,11 @@ import { Nav, NavItem, NavLink } from 'reactstrap';
 import Producto from '../pages/Productos';
 import Colegios from '../pages/Colegios';
 import ShoppingCart from '../pages/ShoppingCart';
+import Home from './Home'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function UserPage() {
-    const [currentView, setCurrentView] = useState('Producto');
+    const [currentView, setCurrentView] = useState('Home');
 
     const changeView = (view) => {
         setCurrentView(view);
@@ -17,6 +18,15 @@ function UserPage() {
             <h1 className="my-4 text-center">Bienvenido a VIASMAE</h1>
             {/* Utilizar Nav de Reactstrap para una mejor apariencia */}
             <Nav tabs className="justify-content-center mb-4">
+            <NavItem>
+                    <NavLink
+                        active={currentView === 'Home'}
+                        onClick={() => setCurrentView('Home')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Home
+                    </NavLink>
+                </NavItem>
                 <NavItem>
                     <NavLink
                         active={currentView === 'Producto'}
@@ -47,7 +57,8 @@ function UserPage() {
             </Nav>
 
             {/* Renderizado condicional de componentes */}
-            {currentView === 'Producto' && <Producto changeView={changeView} />}
+            {currentView === 'Home' && <Home changeView={changeView} />}
+            {currentView === 'Producto' && <Producto />}
             {currentView === 'Colegios' && <Colegios />}
             {currentView === 'ShoppingCart' && <ShoppingCart />}
         </div>

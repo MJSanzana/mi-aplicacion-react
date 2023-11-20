@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const getImageUrl = (imageName) => {
+    return `http://localhost:5000/${imageName}`;
+  };
 // Componente Colegio
 function Colegio({ Nombre_Establecimiento, Direccion, Comuna, Imagen }) {
-  return (
-    <div className="col-md-4 mb-4">
-      <div className="card h-100 shadow-sm">
-        <img src={Imagen || "https://via.placeholder.com/150"} alt={`Imagen de ${Nombre_Establecimiento}`} className="card-img-top" />
-        <div className="card-body">
-          <h5 className="card-title">{Nombre_Establecimiento}</h5>
-          <p className="card-text">{Direccion}</p>
-          <p className="card-text"><small className="text-muted">{Comuna}</small></p>
+    return (
+      <div className="col-md-3 mb-3">
+        <div className="card h-100 shadow-sm">
+        <img src={getImageUrl(Imagen)} alt={`Imagen de ${Nombre_Establecimiento}`} className="card-img-top colegio-imagen" />
+          <div className="card-body">
+            <h5 className="card-title">{Nombre_Establecimiento}</h5>
+            <p className="card-text">{Direccion}</p>
+            <p className="card-text"><small className="text-muted">{Comuna}</small></p>
         </div>
       </div>
     </div>
@@ -20,7 +23,7 @@ function Colegio({ Nombre_Establecimiento, Direccion, Comuna, Imagen }) {
 // Componente de Búsqueda
 function Busqueda({ onSearch }) {
   return (
-    <div className="mb-4">
+    <div className="col-md-4 mb-4 ">
       <input
         type="text"
         className="form-control"
