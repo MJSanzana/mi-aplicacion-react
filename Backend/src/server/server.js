@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const db = require('../api/routes/db/db');
 const jwt = require('jsonwebtoken'); 
+
 const verificarAutenticacion = require('../middlewares/verificarAutenticacion');
 
 
@@ -17,7 +18,9 @@ app.set('trust proxy', 1);
 app.use(express.urlencoded({ extended: true }));
 
 // Servir archivos estáticos desde el directorio 'uploads'
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use('/uploads', express.static('uploads'));
+
+app.use(express.static('public'));
 
 // Configuración de CORS
 app.use(cors({
@@ -28,7 +31,7 @@ app.use(cors({
 // Configuración de Middlewares
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(path.join(__dirname, 'public')));
 
 // Función authenticateJWT
 function authenticateJWT(req, res, next) {

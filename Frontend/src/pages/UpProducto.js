@@ -13,12 +13,12 @@ function UpProducto() {
 
     // Maneja el evento onMouseEnter
     const handleMouseEnter = (imageName, event) => {
-        // Reemplaza los slashes invertidos con slashes normales
-        const correctedImageName = imageName.replace(/\\/g, '/');
+        // Reemplaza los slashes normales con slashes invertidos solo para mostrar
+        const invertedImageName = imageName.replace(/\//g, '\\');
 
-        console.log("Imagen corregida:", correctedImageName);
+        console.log("Imagen invertida:", invertedImageName);
 
-        const imageUrl = `http://localhost:5000/${correctedImageName}`;
+        const imageUrl = `http://localhost:5000/${imageName}`;
 
         // Obtén la posición del enlace
         const linkPosition = event.target.getBoundingClientRect();
