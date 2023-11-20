@@ -38,19 +38,19 @@ function Login({ changeView }) {
                 // Redirige basado en el tipo de usuario
                 switch (response.data.tipoUsuario) {
                     case "Usuario":
-                        navigate('/pagina-usuario');
+                        changeView('Home'); // Cambia a la vista "Home"
                         break;
                     case "Administrador":
-                        navigate('/pagina-administrador');
+                        changeView('UpProducto');
                         break;
                     case "Proveedor":
-                        navigate('/pagina-proveedor');
+                        changeView('CargaProducto');
                         break;
                     case "Soporte":
-                        navigate('/pagina-soporte');
+                        changeView('/pagina-soporte');
                         break;
                     default:
-                        navigate('/pagina-usuario'); // Redirige al Home si no coincide con ningún tipo
+                        changeView('Home'); // Redirige al Home si no coincide con ningún tipo
                 }
             } else {
                 setError(response.data.message);
