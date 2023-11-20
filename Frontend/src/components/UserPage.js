@@ -1,34 +1,60 @@
-// frontend/src/components/UserPage.js
 import React, { useState } from 'react';
+import { Nav, NavItem, NavLink } from 'reactstrap';
 import Producto from '../pages/Productos';
 import Colegios from '../pages/Colegios';
 import ShoppingCart from '../pages/ShoppingCart';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function UserPage() {
     const [currentView, setCurrentView] = useState('Producto');
+
     const changeView = (view) => {
         setCurrentView(view);
     };
 
     return (
         <div>
-            <h1>Productos Disponibles</h1>
-            {/* Aquí puedes tener una barra de navegación o botones para cambiar la vista */}
-            <nav>
-                <button onClick={() => setCurrentView('Producto')}>Producto</button>
-                <button onClick={() => setCurrentView('Colegios')}>Buscar por Colegio</button>
-                <button onClick={() => setCurrentView('ShoppingCart ')}>Carro</button>
-                {/* Más botones o enlaces según sea necesario */}
-            </nav>
+            <h1 className="my-4 text-center">Bienvenido a VIASMAE</h1>
+            {/* Utilizar Nav de Reactstrap para una mejor apariencia */}
+            <Nav tabs className="justify-content-center mb-4">
+                <NavItem>
+                    <NavLink
+                        active={currentView === 'Producto'}
+                        onClick={() => setCurrentView('Producto')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Productos
+                    </NavLink>
+                </NavItem>
+                <NavItem>
+                    <NavLink
+                        active={currentView === 'Colegios'}
+                        onClick={() => setCurrentView('Colegios')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Buscar por Colegio
+                    </NavLink>
+                </NavItem>
+                <NavItem>
+                    <NavLink
+                        active={currentView === 'ShoppingCart'}
+                        onClick={() => setCurrentView('ShoppingCart')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Carro
+                    </NavLink>
+                </NavItem>
+            </Nav>
 
             {/* Renderizado condicional de componentes */}
             {currentView === 'Producto' && <Producto changeView={changeView} />}
             {currentView === 'Colegios' && <Colegios />}
-            {currentView === 'ShoppingCart ' && <ShoppingCart />}
-            {/* ... más vistas/componentes según sea necesario */}
+            {currentView === 'ShoppingCart' && <ShoppingCart />}
         </div>
     );
 }
+
 export default UserPage;
+
 
 

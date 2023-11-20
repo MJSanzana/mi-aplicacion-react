@@ -101,7 +101,7 @@ function ShoppingCart() {
                         </ListGroupItem>
                     </ListGroup>
                     <Button color="danger" block onClick={clearCart}>Vaciar Carrito</Button>
-                    <Button color="success" block>Pagar</Button>
+                    <Button color="primary" block>Pagar</Button>
                 </Col>
             </Row>
         </Container>
