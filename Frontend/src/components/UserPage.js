@@ -4,6 +4,7 @@ import Producto from '../pages/Productos';
 import Colegios from '../pages/Colegios';
 import ShoppingCart from '../pages/ShoppingCart';
 import Home from './Home'
+import Login from './Login';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function UserPage() {
@@ -54,13 +55,24 @@ function UserPage() {
                         Carro
                     </NavLink>
                 </NavItem>
-            </Nav>
+            
+            <NavItem>
+                    <NavLink
+                        active={currentView === 'Login'}
+                        onClick={() => setCurrentView('Login')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Mi cuenta
+                    </NavLink>
+                </NavItem>
+                </Nav>
 
             {/* Renderizado condicional de componentes */}
             {currentView === 'Home' && <Home changeView={changeView} />}
             {currentView === 'Producto' && <Producto />}
             {currentView === 'Colegios' && <Colegios />}
             {currentView === 'ShoppingCart' && <ShoppingCart />}
+            {currentView === 'Login' && <Login />}
         </div>
     );
 }

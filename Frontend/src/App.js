@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '../src/components/AuthContext';
 
 // Importar tus páginas o componentes aquí
-import Home from './components/Home';
+
 import UserPage from './components/UserPage';
 import AdminPage from './components/AdminPage';
 import ProviderPage from './components/ProviderPage';
@@ -18,7 +18,6 @@ function App() {
     <AuthProvider>
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/pagina-usuario" element={<UserPage />} />
         <Route path="/pagina-administrador" element={<AdminPage />} />

@@ -81,7 +81,7 @@ function Login() {
                     <h1 className="mt-4 mb-3">Iniciar Sesión</h1>
                     {error && <p className="text-danger">{error}</p>}
                     <div className="row">
-                        <div className="col-lg-6 offset-lg-3">
+                        <div className="col-lg-4 offset-lg-4">
                             <form onSubmit={handleLogin}>
                                 <div className="mb-3">
                                     <label htmlFor="Email" className="form-label">Correo electrónico</label>
@@ -95,7 +95,7 @@ function Login() {
                                         value={Email}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
-
+                                    <label htmlFor="password" className="form-label">Contraseña</label>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                         <input
                                             type={showPassword ? "text" : "password"}
