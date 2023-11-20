@@ -5,9 +5,9 @@ import { Card, Button, Modal, FormControl, InputGroup, Image } from 'react-boots
 const getImageUrl = (imageName) => {
   return `http://localhost:5000/${imageName}`;
 };
+
 const Productos = ({ changeView }) => {
   const [productos, setProductos] = useState([]);
-  const [carrito, setCarrito] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productoActivo, setProductoActivo] = useState({});
   const [filtro, setFiltro] = useState('');
@@ -15,7 +15,6 @@ const Productos = ({ changeView }) => {
   useEffect(() => {
     fetchProductos();
   }, []);
-
 
   const fetchProductos = () => {
     axios.get('http://localhost:5000/api/ObtenerProductos/')
@@ -28,52 +27,36 @@ const Productos = ({ changeView }) => {
       });
   };
 
-  const agregarAlCarrito = (producto) => {
-    let carritoActualizado = [];
+  // Esta función ahora maneja tanto agregar al carrito como mostrar detalles
+  const agregarYMostrarDetalles = (producto) => {
+    const carritoActualizado = actualizarCarrito(producto);
+    localStorage.setItem('cartItems', JSON.stringify(carritoActualizado));
+    handleShowDetails(producto);
+  };
+
+  // Función para actualizar el carrito
+  const actualizarCarrito = (producto) => {
+    const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
     const existe = carrito.find(item => item.Id === producto.Id);
     if (existe) {
-      carritoActualizado = carrito.map(item =>
+      return carrito.map(item =>
         item.Id === producto.Id ? { ...existe, cantidad: existe.cantidad + 1 } : item
       );
     } else {
-      carritoActualizado = [...carrito, { ...producto, cantidad: 1 }];
+      return [...carrito, { ...producto, cantidad: 1 }];
     }
-    setCarrito(carritoActualizado);
-    localStorage.setItem('cartItems', JSON.stringify(carritoActualizado)); 
-  };
-  
-
-  const calcularTotal = () => {
-    return carrito.reduce((acum, item) => acum + item.Precio * item.cantidad, 0);
   };
 
+  // Función para mostrar los detalles del producto
   const handleShowDetails = (producto) => {
     setProductoActivo(producto);
     setModalShow(true);
   };
 
-  const handleAddToCart = (productoConCantidad) => {
-    // Aquí recibimos el producto con su cantidad y lo agregamos al carrito
-    const { Id, cantidad } = productoConCantidad;
-    const productoExiste = carrito.find((item) => item.Id === Id);
-    if (productoExiste) {
-      // Actualizamos la cantidad del producto existente
-      setCarrito(carrito.map((item) =>
-        item.Id === Id ? { ...item, cantidad: item.cantidad + cantidad } : item
-      ));
-    } else {
-      // Agregamos el nuevo producto al carrito
-      setCarrito([...carrito, productoConCantidad]);
-    }
-  };
-
+  // Filtro para los productos basado en la entrada del usuario
   const productosFiltrados = productos.filter(producto =>
     producto.Nombre.toLowerCase().includes(filtro.toLowerCase())
   );
-
-  const getImageUrl = (imageName) => {
-    return `http://localhost:5000/${imageName}`;
-  };
 
   return (
     <>
@@ -93,36 +76,20 @@ const Productos = ({ changeView }) => {
                 <Card.Body>
                   <Card.Title>{producto.Nombre}</Card.Title>
                   <Card.Text>Precio: ${producto.Precio.toLocaleString()}</Card.Text>
-                  <Button variant="primary" onClick={() => agregarAlCarrito(producto)}>
+                  <Button variant="primary" onClick={() => agregarYMostrarDetalles(producto)}>
                     Agregar al Carrito
-                  </Button>
-                  <Button variant="secondary" onClick={() => handleShowDetails(producto)} className="mt-2">
-                    Ver Detalles
                   </Button>
                 </Card.Body>
               </Card>
             </div>
           ))}
         </div>
-        {carrito.length > 0 && (
-          <div className="mt-3">
-            <h3>Carrito de Compras</h3>
-            <ul>
-              {carrito.map((item, index) => (
-                <li key={index}>
-                  {item.Nombre} - ${item.Precio.toLocaleString()} x {item.cantidad}
-                </li>
-              ))}
-            </ul>
-            <h4>Total: ${calcularTotal().toLocaleString()}</h4>
-          </div>
-        )}
       </div>
       <ProductoModal
         show={modalShow}
         onHide={() => setModalShow(false)}
         producto={productoActivo}
-        onAddToCart={handleAddToCart}
+        // No necesitas pasar la función onAddToCart ya que se maneja dentro del componente
         changeView={changeView}
       />
     </>
@@ -158,7 +125,7 @@ const ProductoModal = ({ show, onHide, producto, onAddToCart, changeView }) => {
   };
   const navigateToCart = () => {
     onHide();
-    changeView('ShoppingCart ');
+    changeView('ShoppingCart');
   };
 
   return (
@@ -182,10 +149,9 @@ const ProductoModal = ({ show, onHide, producto, onAddToCart, changeView }) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={navigateToCart}>
-          Ir a Carrito
+        <Button variant="primary" onClick={navigateToCart}>
+          Ir al Carro
         </Button>
-        <Button onClick={agregarAlCarrito}>Agregar al Carrito</Button>
       </Modal.Footer>
     </Modal>
   );
