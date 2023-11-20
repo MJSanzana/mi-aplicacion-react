@@ -49,8 +49,8 @@ const Productos = () => {
     setModalShow(true);
   };
   
-  
 
+  
   const handleAddToCart = (productoConCantidad) => {
     // Aquí recibimos el producto con su cantidad y lo agregamos al carrito
     const { Id, cantidad } = productoConCantidad;
