@@ -58,7 +58,7 @@ function UpProducto() {
 
     const handleApproval = (productoId) => {
         setIsApproving(true);
-        axios.patch(`http://localhost:5000/api/aprobado/${productoId}`, { aprobado: 1 })
+        axios.put(`http://localhost:5000/api/aprobado/${productoId}`, { aprobado: 1 })
             .then(response => {
                 console.log(response.data.message);
                 fetchProducts();
@@ -82,7 +82,7 @@ function UpProducto() {
     const handleSelectAllProducts = (isSelected) => {
         const newSelectedProducts = {};
         products.forEach((producto) => {
-            newSelectedProducts[producto.id] = isSelected;
+            newSelectedProducts[producto.Id] = isSelected;
         });
         setSelectedProducts(newSelectedProducts);
     };
@@ -162,10 +162,10 @@ function UpProducto() {
                             <td>
                                 <Button
                                     variant="success"
-                                    onClick={() => handleApproval(producto.id)}
-                                    disabled={isApproving || selectedProducts[producto.id]}
+                                    onClick={() => handleApproval(producto.Id)}
+                                    disabled={isApproving || selectedProducts[producto.Id]}
                                 >
-                                    {isApproving && selectedProducts[producto.id] ? 'Aprobando...' : 'Aprobar'}
+                                    {isApproving && selectedProducts[producto.Id] ? 'Aprobando...' : 'Aprobar'}
                                 </Button>
                             </td>
                         </tr>
