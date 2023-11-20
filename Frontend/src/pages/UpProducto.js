@@ -9,14 +9,30 @@ function UpProducto() {
     const [isApproving, setIsApproving] = useState(false);
     const [tooltipImage, setTooltipImage] = useState("");
     const [showTooltip, setShowTooltip] = useState(false);
+    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 }); // Estado para la posición del tooltip
 
     // Maneja el evento onMouseEnter
-    const handleMouseEnter = (imageName) => {
-        // Reemplaza las barras invertidas por barras normales si estás en Windows
-        const formattedImageName = imageName.replace(/\\/g, '/');
-        const imageUrl = `http://localhost:5000/${formattedImageName}`;
+    const handleMouseEnter = (imageName, event) => {
+        // Reemplaza los slashes invertidos con slashes normales
+        const correctedImageName = imageName.replace(/\\/g, '/');
+
+        console.log("Imagen corregida:", correctedImageName);
+
+        const imageUrl = `http://localhost:5000/${correctedImageName}`;
+
+        // Obtén la posición del enlace
+        const linkPosition = event.target.getBoundingClientRect();
+
+        // Calcula la posición del tooltip
+        const tooltipPosition = {
+            top: linkPosition.top + window.scrollY,
+            left: linkPosition.left + window.scrollX + linkPosition.width / 2,
+        };
+
+        setTooltipPosition(tooltipPosition);
         setTooltipImage(imageUrl);
         setShowTooltip(true);
+        console.log("Imagen recibida:", imageName);
     };
 
 
@@ -71,15 +87,11 @@ function UpProducto() {
         setSelectedProducts(newSelectedProducts);
     };
 
-
-
     const handleBulkApproval = () => {
         setIsApproving(true);
 
-        // Crea un array de todos los IDs de productos seleccionados
         const productsToApprove = Object.keys(selectedProducts).filter(key => selectedProducts[key]);
 
-        // Asegúrate de manejar correctamente la aprobación múltiple en tu backend
         axios.patch(`http://localhost:5000/api/aprobado/multiple`, { productsToApprove })
             .then(response => {
                 console.log(response.data.message);
@@ -119,7 +131,7 @@ function UpProducto() {
                 </thead>
                 <tbody>
                     {products.map((producto, index) => (
-                        <tr key={producto.id}>
+                        <tr key={producto.Id}>
                             <td>{index + 1}</td>
                             <td>{producto.Nombre}</td>
                             <td>{producto.Descripcion}</td>
@@ -127,13 +139,22 @@ function UpProducto() {
                             <td>
                                 <a
                                     href="#"
-                                    onMouseEnter={() => handleMouseEnter(producto.Imagen)}
+                                    onMouseEnter={(event) => handleMouseEnter(producto.Imagen, event)}
                                     onMouseLeave={handleMouseLeave}
                                 >
                                     Ver Imagen
                                 </a>
-                                {showTooltip && producto.Imagen === tooltipImage && (
-                                    <div className="image-tooltip active">
+                                {showTooltip && (
+                                    <div
+                                        className="image-tooltip active"
+                                        style={{
+                                            position: 'absolute',
+                                            top: tooltipPosition.top + 'px',
+                                            left: tooltipPosition.left + 'px',
+                                            transform: 'translate(-50%, -50%)',
+                                            zIndex: 1000
+                                        }}
+                                    >
                                         <img src={tooltipImage} alt="Imagen del Producto" />
                                     </div>
                                 )}
@@ -146,22 +167,10 @@ function UpProducto() {
                                 >
                                     {isApproving && selectedProducts[producto.id] ? 'Aprobando...' : 'Aprobar'}
                                 </Button>
-
                             </td>
                         </tr>
                     ))}
                 </tbody>
-                {showTooltip && (
-                    <div
-                        className="image-tooltip active"
-                        style={{
-                            left: '50%',
-                            top: '50%'
-                        }}
-                    >
-                        <img src={tooltipImage} alt="Imagen del Producto" />
-                    </div>
-                )}
             </Table>
             <Button
                 variant="secondary"
@@ -183,4 +192,3 @@ function UpProducto() {
 }
 
 export default UpProducto;
-

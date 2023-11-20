@@ -3,12 +3,14 @@ const db = require('../api/routes/db/db');
 
 // Configuración de Multer para almacenar imágenes en el servidor
 const storage = multer.diskStorage({
-   destination: function (req, file, cb) {
-      cb(null, './uploads/');
-   },
-   filename: function (req, file, cb) {
-      cb(null, `${Date.now()}-${file.originalname}`);
-   }
+    destination: function (req, file, cb) {
+        cb(null, './uploads/');
+    },
+    filename: function (req, file, cb) {
+        const newName = `${Date.now()}-${file.originalname}`;
+        const correctedName = newName.replace(/\\/g, '/');
+        cb(null, correctedName);
+    }
 });
 
 const upload = multer({ storage: storage });
