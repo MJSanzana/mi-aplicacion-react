@@ -20,3 +20,8 @@ code {
 .image-tooltip.active {
   display: block;
 }
+.img-cuadrada {
+  width: 200px;       
+  height: 200px;       
+  object-fit: contain; /* cambiar de cover a contain */
+}
