@@ -4,8 +4,9 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import Footer from '../pages/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {Button} from 'react-bootstrap';
 
-function Login() {
+function Login({ changeView }) {
     const [Email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
@@ -59,7 +60,7 @@ function Login() {
         }
     }
     const navigateToRegister = () => {
-        navigate('/Registro');
+        changeView('Registro');
     };
 
     return (
@@ -69,7 +70,7 @@ function Login() {
                     <h1 className="mt-4 mb-3">Iniciar Sesión</h1>
                     {error && <p className="text-danger">{error}</p>}
                     <div className="row">
-                        <div className="col-lg-6 offset-lg-3">
+                        <div className="col-lg-4 offset-lg-4">
                             <form onSubmit={handleLogin}>
                                 <div className="mb-3">
                                     <label htmlFor="Email" className="form-label">Correo electrónico</label>
@@ -109,8 +110,7 @@ function Login() {
                                         <input className="btn btn-primary" type="submit" name="submit" value="Iniciar sesión" />
                                     </div>
                                     <div className="mt-3">
-                                        ¿Aún no tienes cuenta?
-                                        <button onClick={navigateToRegister} className="btn btn-secondary">Regístrate</button>
+                                        ¿Aún no tienes cuenta? <Button variant="secondary" onClick={navigateToRegister}>Ir a Registro</Button>
                                     </div>
                                 </div>
                             </form>
