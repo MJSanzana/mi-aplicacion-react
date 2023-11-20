@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Modal, FormControl, InputGroup, Image } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 const getImageUrl = (imageName) => {
   return `http://localhost:5000/${imageName}`;
@@ -48,9 +49,9 @@ const Productos = () => {
     setProductoActivo(producto);
     setModalShow(true);
   };
-  
 
-  
+
+
   const handleAddToCart = (productoConCantidad) => {
     // Aquí recibimos el producto con su cantidad y lo agregamos al carrito
     const { Id, cantidad } = productoConCantidad;
@@ -127,18 +128,17 @@ const Productos = () => {
   );
 };
 
-const ProductoModal = ({ show, producto, onHide, onAddToCart }) => {
+const ProductoModal = ({ show, onHide, producto, onAddToCart }) => {
   const [cantidad, setCantidad] = useState(1);
 
   useEffect(() => {
-    // Restablecer la cantidad a 1 cada vez que el modal se abre.
     if (show) {
       setCantidad(1);
     }
   }, [show]);
-  // Funciones para incrementar y decrementar la cantidad
+
   const incrementarCantidad = () => {
-    if (cantidad < 20) { // Asume que 20 es la cantidad máxima permitida
+    if (cantidad < 20) {
       setCantidad(cantidad + 1);
     }
   };
@@ -151,7 +151,7 @@ const ProductoModal = ({ show, producto, onHide, onAddToCart }) => {
 
   const agregarAlCarrito = () => {
     if (producto) {
-      onAddToCart({ ...producto, cantidad: cantidad });
+      onAddToCart({ ...producto, cantidad });
       onHide();
     }
   };
@@ -166,7 +166,7 @@ const ProductoModal = ({ show, producto, onHide, onAddToCart }) => {
       <Modal.Body>
         {producto && (
           <>
-           <Image src={getImageUrl(producto.Imagen)} alt={`Imagen de ${producto.Nombre}`} className="modal-image" fluid />
+            <Image src={getImageUrl(producto.Imagen)} alt={`Imagen de ${producto.Nombre}`} className="modal-image" fluid />
             <p>Precio: ${producto.Precio?.toLocaleString() || 'No disponible'}</p>
             <div className="d-flex align-items-center justify-content-center">
               <Button onClick={decrementarCantidad} disabled={cantidad <= 1}>-</Button>
@@ -177,6 +177,9 @@ const ProductoModal = ({ show, producto, onHide, onAddToCart }) => {
         )}
       </Modal.Body>
       <Modal.Footer>
+        <Button variant="secondary" as={Link} to="/ShoppingCart">
+          Ir a Carrito
+        </Button>
         <Button onClick={agregarAlCarrito}>Agregar al Carrito</Button>
       </Modal.Footer>
     </Modal>
