@@ -15,11 +15,16 @@ function UserPage() {
     const changeView = (view) => {
         setCurrentView(view);
     };
+    const logoStyle = {
+        display: 'inline-block', // Muestra la imagen en línea con el texto
+        marginRight: '250px', // Espacio entre la imagen y el texto
+        verticalAlign: 'middle' // Alinea verticalmente la imagen y el texto
+    };
 
     return (
         <div>
-            <h1 className="my-4 text-center">Bienvenido a VIASMAE</h1>
-            {/* Utilizar Nav de Reactstrap para una mejor apariencia */}
+             <img src="VIASMAE.png" alt="Logo VIASMAE" width="150" style={logoStyle} />
+                <h2 className="my-4 text-center" style={{ backgroundColor: 'light', color: 'black',display: 'inline-block' }}>La Mayor Selección de Uniformes Escolares en Santiago</h2>
             <Nav tabs className="justify-content-center mb-4">
             <NavItem>
                     <NavLink

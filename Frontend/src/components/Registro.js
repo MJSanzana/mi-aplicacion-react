@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Footer from '../pages/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
-//import './Registro.css';
-import { Link } from 'react-router-dom'; // Importa Link si aún no lo has hecho.
+import {Button} from 'react-bootstrap';
 
 function Registro({ changeView }) {
     const [formData, setFormData] = useState({
@@ -35,7 +34,7 @@ function Registro({ changeView }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { NombreUsuario, Apellido, pwd, repeat_pwd, Email } = formData;
+        const { Nombre, Apellido, pwd, repeat_pwd, Email } = formData;
 
         // Validación de email
         const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -159,7 +158,7 @@ function Registro({ changeView }) {
                                 <input className="btn btn-primary" type="submit" name="submit" value="Registrarse" />
                             </div>
                             <div className="mt-3">
-                                ¿Ya tienes cuenta? <span className="link-style" onClick={navigateToLogin}>Inicia sesión</span>
+                                ¿Ya tienes cuenta? <Button variant="secondary" onClick={navigateToLogin}>Inicia sesión</Button>
                             </div>
                         </div>
                     </form>
