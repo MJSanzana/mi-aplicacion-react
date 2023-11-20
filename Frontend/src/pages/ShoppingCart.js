@@ -7,6 +7,17 @@ function ShoppingCart() {
 
     useEffect(() => {
         loadCartFromLocalStorage();
+        // Agregar un escuchador para los cambios en localStorage
+        const handleStorageChange = () => {
+            loadCartFromLocalStorage();
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        // Limpiar el escuchador
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, []);
 
     const loadCartFromLocalStorage = () => {
@@ -28,26 +39,28 @@ function ShoppingCart() {
         setItems(newItems); // Actualiza el estado para reflejar los cambios en la UI
     };
 
-    const increaseQuantity = (name) => {
+    const increaseQuantity = (Nombre) => {
         const newItems = items.map(item =>
-            item.name === name ? { ...item, quantity: item.quantity + 1 } : item
+            item.Nombre === Nombre ? { ...item, cantidad: item.cantidad + 1 } : item
         );
         saveCartToLocalStorage(newItems);
     };
-
-    const decreaseQuantity = (name) => {
+    
+    const decreaseQuantity = (Nombre) => {
         const newItems = items.map(item =>
-            item.name === name ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item
+            item.Nombre === Nombre ? { ...item, cantidad: Math.max(1, item.cantidad - 1) } : item
         );
         saveCartToLocalStorage(newItems);
     };
+    
+    
 
-    const removeItem = (name) => {
-        const newItems = items.filter(item => item.name !== name);
+    const removeItem = (Nombre) => {
+        const newItems = items.filter(item => item.Nombre !== Nombre);
         saveCartToLocalStorage(newItems);
     };
 
-    const total = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const total = items.reduce((acc, item) => acc + (item.Precio * item.cantidad), 0);
 
     return (
         <Container>
@@ -56,21 +69,21 @@ function ShoppingCart() {
                     <h2>Carro ({items.length} productos)</h2>
                     <ListGroup>
                         {items.map(item => (
-                            <ListGroupItem key={item.name}>
+                            <ListGroupItem key={item.Nombre}>
                                 <Row>
                                     <Col md="6">
-                                        <strong>{item.name}</strong>
+                                        <strong>{item.Nombre}</strong>
                                     </Col>
                                     <Col md="2">
-                                        {formatPrice(item.price)}
+                                        {formatPrice(item.Precio)}
                                     </Col>
                                     <Col md="2">
-                                        <Button onClick={() => decreaseQuantity(item.name)}>-</Button>
-                                        {` ${item.quantity} `}
-                                        <Button onClick={() => increaseQuantity(item.name)}>+</Button>
+                                        <Button onClick={() => decreaseQuantity(item.Nombre)}>-</Button>
+                                        {` ${item.cantidad} `}
+                                        <Button onClick={() => increaseQuantity(item.Nombre)}>+</Button>
                                     </Col>
                                     <Col md="2">
-                                        <Button color="warning" onClick={() => removeItem(item.name)}>Eliminar</Button>
+                                        <Button color="warning" onClick={() => removeItem(item.Nombre)}>Eliminar</Button>
                                     </Col>
                                 </Row>
                             </ListGroupItem>

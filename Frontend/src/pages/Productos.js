@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Modal, FormControl, InputGroup, Image } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 
 const getImageUrl = (imageName) => {
   return `http://localhost:5000/${imageName}`;
 };
-const Productos = () => {
+const Productos = ({ changeView }) => {
   const [productos, setProductos] = useState([]);
   const [carrito, setCarrito] = useState([]);
   const [modalShow, setModalShow] = useState(false);
@@ -30,16 +29,19 @@ const Productos = () => {
   };
 
   const agregarAlCarrito = (producto) => {
-
+    let carritoActualizado = [];
     const existe = carrito.find(item => item.Id === producto.Id);
     if (existe) {
-      setCarrito(carrito.map(item =>
+      carritoActualizado = carrito.map(item =>
         item.Id === producto.Id ? { ...existe, cantidad: existe.cantidad + 1 } : item
-      ));
+      );
     } else {
-      setCarrito([...carrito, { ...producto, cantidad: 1 }]);
+      carritoActualizado = [...carrito, { ...producto, cantidad: 1 }];
     }
+    setCarrito(carritoActualizado);
+    localStorage.setItem('cartItems', JSON.stringify(carritoActualizado)); 
   };
+  
 
   const calcularTotal = () => {
     return carrito.reduce((acum, item) => acum + item.Precio * item.cantidad, 0);
@@ -49,8 +51,6 @@ const Productos = () => {
     setProductoActivo(producto);
     setModalShow(true);
   };
-
-
 
   const handleAddToCart = (productoConCantidad) => {
     // Aquí recibimos el producto con su cantidad y lo agregamos al carrito
@@ -123,12 +123,13 @@ const Productos = () => {
         onHide={() => setModalShow(false)}
         producto={productoActivo}
         onAddToCart={handleAddToCart}
+        changeView={changeView}
       />
     </>
   );
 };
 
-const ProductoModal = ({ show, onHide, producto, onAddToCart }) => {
+const ProductoModal = ({ show, onHide, producto, onAddToCart, changeView }) => {
   const [cantidad, setCantidad] = useState(1);
 
   useEffect(() => {
@@ -155,6 +156,10 @@ const ProductoModal = ({ show, onHide, producto, onAddToCart }) => {
       onHide();
     }
   };
+  const navigateToCart = () => {
+    onHide();
+    changeView('ShoppingCart ');
+  };
 
   return (
     <Modal show={show} onHide={onHide} size="md" aria-labelledby="contained-modal-title-vcenter" centered>
@@ -177,7 +182,7 @@ const ProductoModal = ({ show, onHide, producto, onAddToCart }) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" as={Link} to="/ShoppingCart">
+        <Button variant="secondary" onClick={navigateToCart}>
           Ir a Carrito
         </Button>
         <Button onClick={agregarAlCarrito}>Agregar al Carrito</Button>

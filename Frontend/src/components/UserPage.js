@@ -2,9 +2,13 @@
 import React, { useState } from 'react';
 import Producto from '../pages/Productos';
 import Colegios from '../pages/Colegios';
+import ShoppingCart from '../pages/ShoppingCart';
 
 function UserPage() {
-    const [currentView, setCurrentView] = useState('Productos');
+    const [currentView, setCurrentView] = useState('Producto');
+    const changeView = (view) => {
+        setCurrentView(view);
+    };
 
     return (
         <div>
@@ -13,12 +17,14 @@ function UserPage() {
             <nav>
                 <button onClick={() => setCurrentView('Producto')}>Producto</button>
                 <button onClick={() => setCurrentView('Colegios')}>Buscar por Colegio</button>
+                <button onClick={() => setCurrentView('ShoppingCart ')}>Carro</button>
                 {/* Más botones o enlaces según sea necesario */}
             </nav>
 
             {/* Renderizado condicional de componentes */}
-            {currentView === 'Productos' && <Producto   />}
+            {currentView === 'Producto' && <Producto changeView={changeView} />}
             {currentView === 'Colegios' && <Colegios />}
+            {currentView === 'ShoppingCart ' && <ShoppingCart />}
             {/* ... más vistas/componentes según sea necesario */}
         </div>
     );
