@@ -48,10 +48,22 @@ const Productos = () => {
     setProductoActivo(producto);
     setModalShow(true);
   };
+  
+  
 
   const handleAddToCart = (productoConCantidad) => {
-    agregarAlCarrito(productoConCantidad);
-    setModalShow(false);
+    // Aquí recibimos el producto con su cantidad y lo agregamos al carrito
+    const { Id, cantidad } = productoConCantidad;
+    const productoExiste = carrito.find((item) => item.Id === Id);
+    if (productoExiste) {
+      // Actualizamos la cantidad del producto existente
+      setCarrito(carrito.map((item) =>
+        item.Id === Id ? { ...item, cantidad: item.cantidad + cantidad } : item
+      ));
+    } else {
+      // Agregamos el nuevo producto al carrito
+      setCarrito([...carrito, productoConCantidad]);
+    }
   };
 
   const productosFiltrados = productos.filter(producto =>
@@ -117,6 +129,13 @@ const Productos = () => {
 
 const ProductoModal = ({ show, producto, onHide, onAddToCart }) => {
   const [cantidad, setCantidad] = useState(1);
+
+  useEffect(() => {
+    // Restablecer la cantidad a 1 cada vez que el modal se abre.
+    if (show) {
+      setCantidad(1);
+    }
+  }, [show]);
   // Funciones para incrementar y decrementar la cantidad
   const incrementarCantidad = () => {
     if (cantidad < 20) { // Asume que 20 es la cantidad máxima permitida
@@ -132,7 +151,7 @@ const ProductoModal = ({ show, producto, onHide, onAddToCart }) => {
 
   const agregarAlCarrito = () => {
     if (producto) {
-      onAddToCart({ ...producto, cantidad });
+      onAddToCart({ ...producto, cantidad: cantidad });
       onHide();
     }
   };
@@ -147,7 +166,7 @@ const ProductoModal = ({ show, producto, onHide, onAddToCart }) => {
       <Modal.Body>
         {producto && (
           <>
-            <Image src={getImageUrl(producto.Imagen)} alt={`Imagen de ${producto.Nombre}`} fluid />
+           <Image src={getImageUrl(producto.Imagen)} alt={`Imagen de ${producto.Nombre}`} className="modal-image" fluid />
             <p>Precio: ${producto.Precio?.toLocaleString() || 'No disponible'}</p>
             <div className="d-flex align-items-center justify-content-center">
               <Button onClick={decrementarCantidad} disabled={cantidad <= 1}>-</Button>

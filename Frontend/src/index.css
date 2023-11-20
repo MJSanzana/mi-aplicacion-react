@@ -25,3 +25,9 @@ code {
   height: 200px;       
   object-fit: contain; /* cambiar de cover a contain */
 }
+.modal-image {
+  max-width: 100%;  /* Asegura que la imagen no sea más ancha que su contenedor */
+  max-height: 200px; /* Ajusta la altura máxima al valor deseado */
+  display: block;   /* Asegura que la imagen no tenga espacio adicional debajo */
+  margin: 0 auto;   /* Centra la imagen horizontalmente */
+}
