@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState, useContext, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../components/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,36 +11,9 @@ function formatCurrencyToCLP(numberValue) {
     }).format(numberValue);
 }
 
-const asociarProductoConProveedor = async (productoId, idProveedor, setShowModal, setModalText) => {
-    if (!productoId || !idProveedor) {
-        console.error('Faltan el ID del producto o el ID del proveedor.');
-        setShowModal(true);
-        setModalText('Falta el ID del producto o del proveedor. Por favor, intenta de nuevo.');
-        return;
-    }
-
-    const data = {
-        producto_id: productoId,
-        proveedor_id: idProveedor
-    };
-
-    try {
-        const response = await axios.post('http://localhost:5000/api/proveedoresproductos', data);
-        if (response.status === 200) {
-            console.log('Producto asociado con éxito al proveedor.');
-        } else {
-            console.error('Respuesta inesperada del servidor al asociar producto con proveedor.');
-            setShowModal(true);
-            setModalText('Hubo un problema al asociar el producto con el proveedor. Por favor, intenta de nuevo.');
-        }
-    } catch (error) {
-        console.error('Error al asociar el producto con el proveedor:', error);
-        setShowModal(true);
-        setModalText('Error al intentar asociar el producto con el proveedor. Por favor, verifica tu conexión y vuelve a intentarlo.');
-    }
-};
 
 function CargaProducto() {
+    const imagenRef = useRef(null);
     const { usuario } = useContext(AuthContext);
     const idProveedor = usuario ? usuario.userId : null;
 
@@ -141,21 +114,24 @@ function CargaProducto() {
     const handleSendProducto = async (event) => {
         event.preventDefault();
         if (validateFields()) {
-            const { nombre, descripcion, precio, imagen, genero, estado } = formData;
-            const jsonToSend = {
-                nombre: nombre,
-                descripcion: descripcion,
-                precio: precio,
-                imagen: imagen,
-                genero: genero,
-                estado: estado,
-                aprobado: aprobado
-            };
+            // Creamos una instancia de FormData
+            const formDataToSend = new FormData();
+
+            // Agregamos los campos del formulario al objeto FormData
+            formDataToSend.append('nombre', formData.nombre);
+            formDataToSend.append('descripcion', formData.descripcion);
+            formDataToSend.append('genero', formData.genero);
+            formDataToSend.append('precio', formData.precio);
+
+            // Agregamos la imagen
+            if (imagenRef.current && imagenRef.current.files[0]) {
+                formDataToSend.append('imagen', imagenRef.current.files[0]);
+            }
 
             try {
-                const response = await axios.post('http://localhost:5000/api/Createproducts', jsonToSend, {
+                const response = await axios.post('http://localhost:5000/api/Createproducts', formDataToSend, {
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-data',
                     },
                 });
 
@@ -177,6 +153,34 @@ function CargaProducto() {
             }
         }
     };
+    const asociarProductoConProveedor = async (productoId, idProveedor, setShowModal, setModalText) => {
+        if (!productoId || !idProveedor) {
+            console.error('Faltan el ID del producto o el ID del proveedor.');
+            setShowModal(true);
+            setModalText('Falta el ID del producto o del proveedor. Por favor, intenta de nuevo.');
+            return;
+        }
+
+        const data = {
+            producto_id: productoId,
+            proveedor_id: idProveedor
+        };
+
+        try {
+            const response = await axios.post('http://localhost:5000/api/proveedoresproductos', data);
+            if (response.status === 200) {
+                console.log('Producto asociado con éxito al proveedor.');
+            } else {
+                console.error('Respuesta inesperada del servidor al asociar producto con proveedor.');
+                setShowModal(true);
+                setModalText('Hubo un problema al asociar el producto con el proveedor. Por favor, intenta de nuevo.');
+            }
+        } catch (error) {
+            console.error('Error al asociar el producto con el proveedor:', error);
+            setShowModal(true);
+            setModalText('Error al intentar asociar el producto con el proveedor. Por favor, verifica tu conexión y vuelve a intentarlo.');
+        }
+    };
     const handleSendTallasYCantidades = async (event) => {
         event.preventDefault();
         if (!productoID || formData.tallasCantidades.length === 0) {
@@ -193,17 +197,17 @@ function CargaProducto() {
                     Cantidad: tc.cantidad
                 }))
             };
-    
+
             const response = await axios.post('http://localhost:5000/api/productosvariantes', tallasCantidadesData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             if (response.status === 200) {
                 setShowModal(true);
                 setModalText('Tallas y cantidades agregadas con éxito.');
-                
+
                 // Reinicia el formulario a su estado inicial aquí
                 setFormData({
                     nombre: '',
@@ -217,18 +221,16 @@ function CargaProducto() {
                 });
                 setDisplayPrecio('');
                 setProductoEnviado(false); // Si también deseas resetear esta parte del estado.
-    
+
             } else {
                 setShowModal(true);
                 setModalText('Respuesta inesperada del servidor.');
             }
         } catch (error) {
-            console.error("Error al enviar tallas y cantidades:", error);
             setShowModal(true);
-            setModalText('Error al enviar tallas y cantidades. Por favor, intenta de nuevo.');
+            setModalText(error.message || 'Error al enviar el producto. Por favor, intenta de nuevo.');
         }
     };
-    
 
     return (
         <div className="container my-5">
@@ -270,13 +272,13 @@ function CargaProducto() {
                             </div>
 
                             <div className="form-group col-md-8">
-                                <label htmlFor="Imagen">Imagen:</label>
-                                <input type="file" className="form-control" name="imagen" onChange={handleInputChange} required />
+                                <label htmlFor="imagen">Imagen:</label>
+                                <input type="file" className="form-control" name="imagen" ref={imagenRef} onChange={handleInputChange} required />
                             </div>
                         </div>
                         <div className="form-row">
                             <div className="col text-center">
-                            <button type="submit" className="btn btn-primary btn-lg4" disabled={isProductFormDisabled}>Guardar Producto</button>
+                                <button type="submit" className="btn btn-primary btn-lg4" disabled={isProductFormDisabled}>Guardar Producto</button>
                             </div>
                         </div>
                     </form> {/* Aquí se cierra el form */}
