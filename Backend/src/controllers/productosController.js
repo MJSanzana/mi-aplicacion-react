@@ -1,3 +1,4 @@
+//productosController.js
 const multer = require('multer');
 const db = require('../api/routes/db/db');
 
@@ -85,5 +86,17 @@ exports.getProductosPendientes = async (req, res) => {
     } catch (err) {
         console.error('Error al obtener los productos pendientes:', err);
         return res.status(500).json({ message: 'Error interno del servidor al obtener los productos pendientes' });
+    }
+};
+exports.obtenerProductosPorProveedor = async (req, res) => {
+    const proveedorId = req.params.userId;
+
+    try {
+        const sqlQuery = 'SELECT p.* FROM Productos p INNER JOIN ProveedoresProductos pp ON p.id = pp.producto_id WHERE pp.proveedor_id = ?';
+        const productos = await db.query(sqlQuery, [proveedorId]);
+
+        res.json(productos);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };

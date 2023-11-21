@@ -30,5 +30,20 @@ exports.crearProveedorProducto = async (req, res) => {
     }
 };
 
+exports.obtenerProductosPorProveedor = async (req, res) => {
+    const proveedorId = req.params.userId;
+
+    try {
+        // Asumiendo que tienes una tabla que relaciona proveedores y productos
+        const sqlQuery = 'SELECT p.* FROM Productos p INNER JOIN ProveedoresProductos pp ON p.id = pp.producto_id WHERE pp.proveedor_id = ?';
+        const productos = await db.query(sqlQuery, [proveedorId]);
+
+        res.json(productos);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 
 // Otros métodos para actualizar y eliminar asociaciones proveedor-producto

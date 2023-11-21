@@ -19,12 +19,18 @@ const GestionProductos = () => {
 
         const response = await axios.get(`http://localhost:5000/api/ObtenerProductos/${userId}`, { headers });
         setProductos(response.data.productos);
+        console.log(response.data);
+        // Asegúrate de que la estructura de datos es correcta
+        if (response.data && Array.isArray(response.data.productos)) {
+          setProductos(response.data.productos);
+        } else {
+          throw new Error("Formato de respuesta inesperado");
+        }
       } catch (err) {
-        setError('Error al obtener los productos');
+        setError('Error al obtener los productos: ' + err.message);
         console.error(err);
       }
     };
-
     obtenerProductos();
   }, [userId, token]);
 
@@ -63,8 +69,8 @@ const GestionProductos = () => {
           }}>
             {producto.variantes.map((variante, index) => (
               <div key={index}>
-                <label>Talla {variante.talla}:</label> 
-                <input type="number" defaultValue={variante.cantidad} /> 
+                <label>Talla {variante.talla}:</label>
+                <input type="number" defaultValue={variante.cantidad} />
               </div>
             ))}
             <button type="submit">Actualizar Cantidades</button>
