@@ -100,9 +100,15 @@ function ShoppingCart() {
                             </Row>
                         </ListGroupItem>
                     </ListGroup>
+                    </Col>
+                    <div className="input-field col-2 offset-9 mb-2">
                     <Button color="danger" block onClick={clearCart}>Vaciar Carrito</Button>
+                    </div>
+                    <div className="input-field col-2 offset-9 mb-2">
                     <Button color="primary" block>Pagar</Button>
-                </Col>
+                    </div>
+                    
+                
             </Row>
         </Container>
     );
