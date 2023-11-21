@@ -6,12 +6,14 @@ import Footer from '../pages/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button } from 'react-bootstrap';
 
+
 function Login({ changeView }) {
     const [Email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -50,11 +52,12 @@ function Login({ changeView }) {
             return;
         }
         try {
-            const response = await axios.post('http://localhost:5000/api/Login', { Email, Contraseña: password });
+            const response = await axios.post('http://localhost:5000/api/Login', { Email, Contraseña: password, NombreUsuario });
             if (response.status === 200 && response.data && response.data.token) {
                 localStorage.setItem('token', response.data.token);
-                localStorage.setItem('userId', response.data.userId); // Asegúrate de que la clave 'userId' sea la misma que el backend envía.
-                handleLoginResponse(response.data.tipoUsuario); // Llama a la función con la respuesta correcta
+                localStorage.setItem('userId', response.data.userId);
+                localStorage.setItem('NombreUsuario', response.data.NombreUsuario);
+                handleLoginResponse(response.data.tipoUsuario);
             } else {
                 setError(response.data.message);
             }
