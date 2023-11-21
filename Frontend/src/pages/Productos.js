@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Modal, FormControl, InputGroup, Image } from 'react-bootstrap';
-
+import { useHistory } from 'react-router-dom';
+// Otras importaciones aquí...
 const getImageUrl = (imageName) => {
   return `http://localhost:5000/${imageName}`;
 };
 
-const Productos = ({ changeView }) => {
+function Productos({ changeView }) {
   const [productos, setProductos] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productoActivo, setProductoActivo] = useState({});
@@ -89,14 +90,21 @@ const Productos = ({ changeView }) => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         producto={productoActivo}
-        // No necesitas pasar la función onAddToCart ya que se maneja dentro del componente
-        changeView={changeView}
+        changeView={changeView} // Asegúrate de pasar changeView aquí
       />
+
+
     </>
   );
 };
 
-const ProductoModal = ({ show, onHide, producto, changeView }) => {
+const ProductoModal = ({ show, onHide, producto }) => {
+  const history = useHistory();
+
+  const navigateToCart = () => {
+    onHide();
+    history.push('/ShoppingCart');
+  };
   // Usar un estado local para manejar la cantidad del producto en el modal.
   const [cantidad, setCantidad] = useState(1);
 
@@ -141,10 +149,6 @@ const ProductoModal = ({ show, onHide, producto, changeView }) => {
       onAddToCart({ ...producto, cantidad });
       onHide();
     }
-  };
-  const navigateToCart = () => {
-    onHide();
-    changeView('ShoppingCart');
   };
 
   return (
