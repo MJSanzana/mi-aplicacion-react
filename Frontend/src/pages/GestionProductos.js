@@ -71,36 +71,42 @@ const GestionProductos = () => {
     e.preventDefault();
     setUpdateSuccess('');
     setUpdateError('');
-
+  
+    // Obten los cambios de variantes específicos para este producto
     const variantesParaActualizar = Object.entries(variantesModificadas)
       .filter(([key]) => key.startsWith(`${productoId}-`))
       .map(([key, cantidad]) => {
         const talla = key.split('-')[1];
-        return { producto_id: productoId, talla, cantidad };
+        return { producto_id: productoId, talla, cantidad: parseInt(cantidad) };
       });
-
+  
     try {
-      for (const variante of variantesParaActualizar) {
+      // Si hay variantes para actualizar, realiza la solicitud PUT para cada una
+      if (variantesParaActualizar.length > 0) {
         const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         };
-
-        const response = await axios.put('http://localhost:5000/api/actualizarVariante', variante, { headers });
-        if (response.status === 200) {
-          // Aquí podrías actualizar el estado de tus productos si es necesario
-          console.log('Variante actualizada con éxito');
-          setUpdateSuccess(`Variante Cantidad con talla ${variante.talla} actualizada correctamente.`);
+  
+        // Actualiza las variantes una por una
+        for (const variante of variantesParaActualizar) {
+          await axios.put('http://localhost:5000/api/actualizarVariante', variante, { headers });
         }
+  
+        setUpdateSuccess('Variantes actualizadas correctamente.');
+        setVariantesModificadas({});
+  
+        // Actualiza la lista de productos para reflejar los cambios
+        await obtenerProductos();
+      } else {
+        // Si no hay cambios, no hacer nada o mostrar un mensaje
+        setUpdateError('No hay cambios en las variantes para actualizar.');
       }
-      // Limpia el estado de variantesModificadas y refresca los productos
-      setVariantesModificadas({});
-      await obtenerProductos();
     } catch (err) {
-      // Configura un mensaje de error si algo sale mal
       setUpdateError('Error al actualizar variantes: ' + (err.response?.data?.message || err.message));
     }
   };
+  
   // Renderiza los productos y un formulario para actualizar las cantidades
   return (
     <div className="container mt-4">
