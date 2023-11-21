@@ -40,7 +40,7 @@ const GestionProductos = () => {
         variantes
       };
 
-      await axios.post('http://localhost:5000/api/productosvariantes', body, { headers });
+      await axios.put('http://localhost:5000/api/actualizarVariante', body, { headers });
       // Aquí puedes actualizar el estado de tus productos si es necesario
     } catch (err) {
       setError('Error al actualizar variantes');
@@ -56,17 +56,15 @@ const GestionProductos = () => {
       {productos.map((producto) => (
         <div key={producto.id}>
           <h2>{producto.nombre}</h2>
-          {/* Resto de la información del producto */}
-          {/* Un formulario por producto para actualizar las variantes */}
+          <img src={producto.imagen} alt={producto.nombre} />
           <form onSubmit={(e) => {
             e.preventDefault();
-            // Aquí recogerías los valores de los inputs para cada talla y llamarías a actualizarVariantes
+            // Lógica para recoger los valores de los inputs y llamar a actualizarVariantes
           }}>
-            {/* Genera un input por cada talla disponible */}
-            {producto.variantes.map(variante => (
-              <div key={variante.Talla}>
-                <label>Talla {variante.Talla}:</label>
-                <input type="number" defaultValue={variante.Cantidad} /* Aquí vinculas el input con el estado o form */ />
+            {producto.variantes.map((variante, index) => (
+              <div key={index}>
+                <label>Talla {variante.talla}:</label> 
+                <input type="number" defaultValue={variante.cantidad} /> 
               </div>
             ))}
             <button type="submit">Actualizar Cantidades</button>
