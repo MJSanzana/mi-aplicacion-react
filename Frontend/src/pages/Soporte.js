@@ -40,6 +40,15 @@ const Soporte = () => {
 
                 if (response.status === 200) {
                     setShowSuccessModal(true);
+                    // Restablece formData y cualquier otro estado necesario aquí
+                    setFormData({
+                        Nombre: '',
+                        Email: '',
+                        Problema: '',
+                        CommonErrors: []
+                    });
+                    // Si también quieres borrar el mensaje de error después de un envío exitoso
+                    setError('');
                 } else {
                     setError("Error en el servidor: " + response.status);
                 }
@@ -50,6 +59,7 @@ const Soporte = () => {
             setError('Por favor, complete todos los campos del formulario.');
         }
     }
+
 
     const handleCheckboxChange = (e) => {
         setFormData(prevState => ({
@@ -68,80 +78,93 @@ const Soporte = () => {
         setShowSuccessModal(false);
     };
     return (
-        <div className="d-flex flex-column min-vh-100">
-            <div className="container my-5">
-                <h1 className="mb-4">Contacto soporte</h1>
-                <form onSubmit={handleSubmit} className="p-4 border rounded" ref={formRef}>
-                    <div className="form-group mb-3">
+
+        <div className="container mt-5">
+            <h1 className="mt-1 mb-4">Contacto Soporte</h1>
+            <form onSubmit={handleSubmit} className="p-5 border rounded" ref={formRef}>
+                {/* Campo Nombre */}
+                <div className="row">
+                    <div className="input-field col-8 offset-2">
                         <label htmlFor="Nombre">Nombre:</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="Nombre"
-                            id="Nombre"
-                            value={formData.Nombre}
-                            onChange={handleChange} // Utilizando handleChange
-                            required
-                        />
+                        <input type="text" className="form-control form-control-lg" name="Nombre" id="Nombre" value={formData.Nombre} onChange={handleChange} required />
                     </div>
+                </div>
 
-                    <div className="form-group mb-3">
+                {/* Campo Email */}
+                <div className="row">
+                    <div className="input-field col-8 offset-2">
                         <label htmlFor="Email">Email:</label>
-                        <input
-                            type="Email"
-                            className="form-control"
-                            name="Email"
-                            id="Email"
-                            value={formData.Email}
-                            onChange={handleChange} // Utilizando handleChange
-                            required
-                        />
+                        <input type="Email" className="form-control form-control-lg" name="Email" id="Email" value={formData.Email} onChange={handleChange} required />
                     </div>
-                    <div className="form-group mb-3">
+                </div>
+
+                {/* Selección de Error Común */}
+                <div className="row">
+                    <div className="input-field col-8 offset-2">
                         <label>Error:</label><br />
-                        <input type="checkbox" value="Inicio de sesión fallido" name="CommonErrors" onChange={handleCheckboxChange} /> Inicio de sesión fallido<br />
-                        <input type="checkbox" value="Problema al realizar un pedido" name="CommonErrors" onChange={handleCheckboxChange} /> Problema al realizar un pedido<br />
-                        <input type="checkbox" value="Error al visualizar productos" name="CommonErrors" onChange={handleCheckboxChange} /> Error al visualizar productos<br />
-                        <input type="checkbox" value="Otro" name="CommonErrors" onChange={handleCheckboxChange} /> Otro<br />
-                    </div>
-
-
-                    <div className="form-group mb-3">
-                        <label htmlFor="Problema">Describa su problema:</label>
-                        <textarea
-                            className="form-control"
-                            name="Problema"
-                            id="Problema"
-                            rows="5"
-                            value={formData.Problema} // Usa formData.Problema aquí
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <button type="submit" className="btn btn-primary" disabled={formData.CommonErrors.length === 0}>Enviar</button>
-                </form>
-                <Footer />
-
-                <div className={`modal fade ${showSuccessModal ? 'show' : ''}`} id="successModal" tabIndex="-1" aria-labelledby="successModalLabel" aria-hidden="true" style={showSuccessModal ? { display: 'block' } : {}}>
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="successModalLabel">Éxito</h5>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseModal}></button>
-                            </div>
-                            <div className="modal-body">
-                                <p>Su mensaje ha sido enviado correctamente. Hemos enviado su ticket al equipo de soporte.</p>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseModal}>Cerrar</button>
-                            </div>
+                        <div className="form-check">
+                            <input className="form-check-input" type="radio" name="CommonErrors" id="error1" value="Inicio de sesión fallido" onChange={handleCheckboxChange} />
+                            <label className="form-check-label" htmlFor="error1">
+                                Inicio de sesión fallido
+                            </label>
+                        </div>
+                        <div className="form-check">
+                            <input className="form-check-input" type="radio" name="CommonErrors" id="error2" value="Problema al realizar un pedido" onChange={handleCheckboxChange} />
+                            <label className="form-check-label" htmlFor="error2">
+                                Problema al realizar un pedido
+                            </label>
+                        </div>
+                        <div className="form-check">
+                            <input className="form-check-input" type="radio" name="CommonErrors" id="error3" value="Error al visualizar productos" onChange={handleCheckboxChange} />
+                            <label className="form-check-label" htmlFor="error3">
+                                Error al visualizar productos
+                            </label>
+                        </div>
+                        <div className="form-check">
+                            <input className="form-check-input" type="radio" name="CommonErrors" id="error4" value="Otro" onChange={handleCheckboxChange} />
+                            <label className="form-check-label" htmlFor="error4">
+                                Otro
+                            </label>
                         </div>
                     </div>
                 </div>
 
+                {/* Descripción del Problema */}
+                <div className="row">
+                    <div className="input-field col-8 offset-2">
+                        <label htmlFor="Problema">Describa su problema:</label>
+                        <textarea className="form-control form-control-lg" name="Problema" id="Problema" rows="5" value={formData.Problema} onChange={handleChange} required />
+                    </div>
+                </div>
+
+                {/* Botón de Enviar */}
+                <div className="row">
+                    <div className="input-field col-5 offset-5">
+                        <button type="submit" className="btn btn-primary btn-lg" disabled={formData.CommonErrors.length === 0}>Enviar</button>
+                    </div>
+                </div>
+            </form>
+            <Footer />
+
+            <div className={`modal fade ${showSuccessModal ? 'show' : ''}`} id="successModal" tabIndex="-1" aria-labelledby="successModalLabel" aria-hidden="true" style={showSuccessModal ? { display: 'block' } : {}}>
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="successModalLabel">Éxito</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseModal}></button>
+                        </div>
+                        <div className="modal-body">
+                            <p>Su mensaje ha sido enviado correctamente. Hemos enviado su ticket al equipo de soporte.</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleCloseModal}>Cerrar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
+
     );
 };
 
