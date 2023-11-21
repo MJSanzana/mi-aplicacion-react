@@ -83,7 +83,7 @@ exports.loginUser = async (req, res) => {
     const token = jwt.sign({ id: user.Id }, jwtSecret, { expiresIn: '4h' });
 
     // Agregar el tipo de usuario a la respuesta
-    res.json({ message: 'Inicio de sesión exitoso', userId: user.Id, token, tipoUsuario: user.TipoUsuario });
+    res.json({ message: 'Inicio de sesión exitoso', userId: user.Id, token, tipoUsuario: user.TipoUsuario , NombreUsuario: user.NombreUsuario});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
