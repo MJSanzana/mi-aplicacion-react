@@ -53,6 +53,7 @@ function Login({ changeView }) {
             const response = await axios.post('http://localhost:5000/api/Login', { Email, Contraseña: password });
             if (response.status === 200 && response.data && response.data.token) {
                 localStorage.setItem('token', response.data.token);
+                localStorage.setItem('userId', response.data.userId); // Asegúrate de que la clave 'userId' sea la misma que el backend envía.
                 handleLoginResponse(response.data.tipoUsuario); // Llama a la función con la respuesta correcta
             } else {
                 setError(response.data.message);
@@ -60,6 +61,7 @@ function Login({ changeView }) {
         } catch (err) {
             setError(err.response && err.response.data && err.response.data.message ? err.response.data.message : 'Error al intentar iniciar sesión. Por favor intenta nuevamente.');
         }
+    
     };
     const navigateToRegister = () => {
         changeView('Registro');

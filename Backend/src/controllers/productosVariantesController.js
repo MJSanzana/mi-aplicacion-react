@@ -50,6 +50,16 @@ exports.actualizarVariante = async (req, res) => {
     }
 };
 
+exports.obtenerVariantesPorProductoId = async (req, res) => {
+    const productoId = req.params.productoId;
+
+    try {
+        const variantes = await db.query('SELECT * FROM ProductosVariantes WHERE Producto_Id = ?', [productoId]);
+        res.json(variantes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
 

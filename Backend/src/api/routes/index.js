@@ -43,6 +43,7 @@ router.get('/productos/pendientes', productosController.getProductosPendientes);
 
 // Rutas para ProductosVariantes
 router.get('/productosvariantes', productosVariantesController.obtenerVariantes);
+router.get('/c:productoId', productosVariantesController.obtenerVariantesPorProductoId);
 router.post('/productosvariantes', productosVariantesController.crearVariante); 
 router.put('/actualizarVariante', productosVariantesController.actualizarVariante);
 
