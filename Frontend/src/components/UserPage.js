@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Nav, NavItem, NavLink } from 'reactstrap';
-import Producto from '../pages/Productos';
+import Productos from '../pages/Productos';
 import Colegios from '../pages/Colegios';
 import ShoppingCart from '../pages/ShoppingCart';
 import Home from './Home'
@@ -48,8 +48,8 @@ function UserPage() {
                 
                 <NavItem>
                     <NavLink
-                        active={currentView === 'Producto'}
-                        onClick={() => setCurrentView('Producto')}
+                        active={currentView === 'Productos'}
+                        onClick={() => setCurrentView('Productos')}
                         style={{ cursor: 'pointer' }}
                     >
                         Productos
@@ -86,7 +86,7 @@ function UserPage() {
 
             {/* Renderizado condicional de componentes */}
             {currentView === 'Home' && <Home changeView={changeView} />}
-            {currentView === 'Producto' && <Producto />}
+            {currentView === 'Productos' && <Productos changeView={changeView} />}
             {currentView === 'Colegios' && <Colegios />}
             {currentView === 'ShoppingCart' && <ShoppingCart />}
             {currentView === 'Login' && <Login changeView={changeView} />}

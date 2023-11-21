@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Modal, FormControl, InputGroup, Image } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
 // Otras importaciones aquí...
 const getImageUrl = (imageName) => {
   return `http://localhost:5000/${imageName}`;
 };
 
-function Productos({ changeView }) {
+function Productos({changeView}) {
+
   const [productos, setProductos] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productoActivo, setProductoActivo] = useState({});
@@ -90,30 +90,27 @@ function Productos({ changeView }) {
         show={modalShow}
         onHide={() => setModalShow(false)}
         producto={productoActivo}
-        changeView={changeView} // Asegúrate de pasar changeView aquí
+        changeView={changeView}
       />
-
-
     </>
   );
-};
+}
 
-const ProductoModal = ({ show, onHide, producto }) => {
-  const history = useHistory();
-
+const ProductoModal = ({ show, onHide, producto, changeView }) => {
+  const [cantidad, setCantidad] = useState(1);
   const navigateToCart = () => {
     onHide();
-    history.push('/ShoppingCart');
+    changeView('ShoppingCart'); // Cambia la vista usando changeView
   };
-  // Usar un estado local para manejar la cantidad del producto en el modal.
-  const [cantidad, setCantidad] = useState(1);
+
 
   useEffect(() => {
-    // Cada vez que se muestra el modal, actualiza la cantidad según el carrito.
     const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
     const productoEnCarrito = carrito.find(item => item.Id === producto.Id);
     setCantidad(productoEnCarrito ? productoEnCarrito.cantidad : 1);
   }, [show, producto.Id]);
+
+
 
   const actualizarCarrito = (delta) => {
     const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
