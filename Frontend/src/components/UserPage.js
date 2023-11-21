@@ -7,6 +7,7 @@ import Home from './Home'
 import Login from './Login';
 import Registro from './Registro';
 import Nosotros from '../pages/Nosotros';
+import Soporte from '../pages/Soporte';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function UserPage() {
@@ -34,7 +35,17 @@ function UserPage() {
                     >
                         Home
                     </NavLink>
+                    </NavItem>
+                    <NavItem>
+                    <NavLink
+                        active={currentView === 'Soporte'}
+                        onClick={() => setCurrentView('Soporte')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Contactanos
+                    </NavLink>
                 </NavItem>
+                
                 <NavItem>
                     <NavLink
                         active={currentView === 'Producto'}
@@ -81,6 +92,7 @@ function UserPage() {
             {currentView === 'Login' && <Login changeView={changeView} />}
             {currentView === 'Registro' && <Registro changeView={changeView} />}
             {currentView === 'Nosotros' && <Nosotros />}
+            {currentView === 'Soporte' && <Soporte />}
         </div>
     );
 }
