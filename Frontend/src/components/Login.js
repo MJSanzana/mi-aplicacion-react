@@ -16,6 +16,25 @@ function Login({ changeView }) {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     }
+    const handleLoginResponse = (tipoUsuario) => {
+
+        switch (tipoUsuario) {
+            case "Usuario":
+                navigate('/pagina-usuario'); // Navega a la página del usuario
+                break;
+            case "Administrador":
+                navigate('/pagina-administrador'); // Navega a la página del administrador
+                break;
+            case "Proveedor":
+                navigate('/pagina-proveedor'); // Navega a la página del proveedor
+                break;
+            case "Soporte":
+                navigate('/pagina-soporte'); // Navega a la página de soporte
+                break;
+            default:
+                navigate('/pagina-usuario'); // Navega a la página de inicio por defecto
+        }
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -34,31 +53,14 @@ function Login({ changeView }) {
             const response = await axios.post('http://localhost:5000/api/Login', { Email, Contraseña: password });
             if (response.status === 200 && response.data && response.data.token) {
                 localStorage.setItem('token', response.data.token);
-
-                // Redirige basado en el tipo de usuario
-                switch (response.data.tipoUsuario) {
-                    case "Usuario":
-                        changeView('Home'); // Cambia a la vista "Home"
-                        break;
-                    case "Administrador":
-                        changeView('UpProducto');
-                        break;
-                    case "Proveedor":
-                        changeView('CargaProducto');
-                        break;
-                    case "Soporte":
-                        changeView('/pagina-soporte');
-                        break;
-                    default:
-                        changeView('Home'); // Redirige al Home si no coincide con ningún tipo
-                }
+                handleLoginResponse(response.data.tipoUsuario); // Llama a la función con la respuesta correcta
             } else {
                 setError(response.data.message);
             }
         } catch (err) {
             setError(err.response && err.response.data && err.response.data.message ? err.response.data.message : 'Error al intentar iniciar sesión. Por favor intenta nuevamente.');
         }
-    }
+    };
     const navigateToRegister = () => {
         changeView('Registro');
     };
@@ -105,7 +107,7 @@ function Login({ changeView }) {
                                         </button>
                                     </div>
                                     <div className="input-field col-8 offset-1 mb-2">
-                                    <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+                                        <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
                                     </div>
                                     <div className="d-grid ">
                                         <div className="row">

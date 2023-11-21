@@ -1,26 +1,53 @@
 // ProviderPage.js
+// ProviderPage.js
 import React, { useState } from 'react';
+import { Nav, NavItem, NavLink } from 'reactstrap';
 import CargaProducto from '../pages/CargaProducto';
-//import GestionProductos from '../pages/GestionProductos';
+import GestionProductos from '../pages/GestionProductos';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function ProviderPage() {
     const [currentView, setCurrentView] = useState('CargaProducto');
 
+	const changeView = (view) => {
+        setCurrentView(view);
+    };
+	const logoStyle = {
+        display: 'inline-block', 
+        marginRight: '250px', 
+        verticalAlign: 'middle' 
+    };
     return (
         <div>
-            <h1>Bienvenido Proveedor</h1>
-            {/* Aquí puedes tener una barra de navegación o botones para cambiar la vista */}
-            <nav>
-                <button onClick={() => setCurrentView('CargaProducto')}>Cargar Producto</button>
-                <button onClick={() => setCurrentView('gestionProductos')}>Gestionar Productos</button>
-                {/* Más botones o enlaces según sea necesario */}
-            </nav>
+            <img src="VIASMAE.png" alt="Logo VIASMAE" width="150" style={logoStyle} />
+                <h2 className="my-6 text-center" style={{ backgroundColor: 'light', color: 'green',display: 'inline-block' }}>Bienvenido Proveedor</h2>
+            <Nav tabs className="justify-content-center mb-6">
+            <NavItem>
+                    <NavLink
+                        active={currentView === 'CargaProducto'}
+                        onClick={() => setCurrentView('CargaProducto')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Subir Producto
+                    </NavLink>
+                    </NavItem>
+					<NavItem>
+                    <NavLink
+                        active={currentView === 'GestionProductos'}
+                        onClick={() => setCurrentView('GestionProductos')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Editar Mis Productos
+                    </NavLink>
+                </NavItem>
+                </Nav>
 
             {/* Renderizado condicional de componentes */}
             {currentView === 'CargaProducto' && <CargaProducto   />}
-            {currentView === 'gestionProductos' && <GestionProductos />}
+            {currentView === 'GestionProductos' && <GestionProductos />}
             {/* ... más vistas/componentes según sea necesario */}
         </div>
+        
     );
 }
 export default ProviderPage;
