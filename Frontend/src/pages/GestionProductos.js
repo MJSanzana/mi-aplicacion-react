@@ -13,7 +13,38 @@ const GestionProductos = () => {
   const [updateError, setUpdateError] = useState('');
   const token = localStorage.getItem('token'); // Mueve el token aquí para usarlo en múltiples funciones
 
+  const obtenerProductos = async () => {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId || !token) {
+      setError('No se ha iniciado sesión o falta la información del usuario.');
+      return;
+    }
+
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      const productosResponse = await axios.get(`http://localhost:5000/api/ObtenerProductos/${userId}`, { headers });
+      if (productosResponse.data && Array.isArray(productosResponse.data)) {
+        const productosConVariantes = await Promise.all(productosResponse.data.map(async (producto) => {
+          const variantes = await obtenerVariantesPorProducto(producto.Id);
+          return { ...producto, variantes };
+        }));
+        setProductos(productosConVariantes);
+      } else {
+        throw new Error("Formato de respuesta inesperado");
+      }
+    } catch (err) {
+      setError('Error al obtener los productos: ' + err.message);
+      console.error(err);
+    }
+  };
   useEffect(() => {
+    obtenerProductos();
+  }, []);
     const obtenerVariantesPorProducto = async (productoId) => {
       try {
         const variantesResponse = await axios.get(`http://localhost:5000/api/obtenerVariantesPorProductoId/${productoId}`, {
@@ -29,38 +60,6 @@ const GestionProductos = () => {
       }
     };
 
-    const obtenerProductos = async () => {
-      const userId = localStorage.getItem('userId');
-
-      if (!userId || !token) {
-        setError('No se ha iniciado sesión o falta la información del usuario.');
-        return;
-      }
-
-      try {
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        };
-
-        const productosResponse = await axios.get(`http://localhost:5000/api/ObtenerProductos/${userId}`, { headers });
-        if (productosResponse.data && Array.isArray(productosResponse.data)) {
-          const productosConVariantes = await Promise.all(productosResponse.data.map(async (producto) => {
-            const variantes = await obtenerVariantesPorProducto(producto.Id);
-            return { ...producto, variantes };
-          }));
-          setProductos(productosConVariantes);
-        } else {
-          throw new Error("Formato de respuesta inesperado");
-        }
-      } catch (err) {
-        setError('Error al obtener los productos: ' + err.message);
-        console.error(err);
-      }
-    };
-
-    obtenerProductos();
-  }, []);
   const handleCantidadChange = (productoId, talla, nuevaCantidad) => {
     setVariantesModificadas(prevState => ({
       ...prevState,
