@@ -1,38 +1,41 @@
 // Login.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { AuthContext } from '../components/AuthContext';
 import Footer from '../pages/Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button } from 'react-bootstrap';
 
-function Login({ changeView}) {
+function Login({ changeView }) {
     const [Email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
+    const { login } = useContext(AuthContext);
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
-    }
-    const handleLoginResponse = (tipoUsuario) => {
+    };
 
-        switch (tipoUsuario) {
-            case "Usuario":
-                navigate('/pagina-usuario'); // Navega a la página del usuario
-                break;
+    const handleLoginResponse = (userData) => {
+        login(userData); // Actualiza el estado global de autenticación con la función login del AuthContext
+        // Redirige al usuario a su página correspondiente
+        switch (userData.tipoUsuario) {
             case "Administrador":
-                navigate('/pagina-administrador'); // Navega a la página del administrador
+                navigate('/pagina-administrador');
                 break;
             case "Proveedor":
-                navigate('/pagina-proveedor'); // Navega a la página del proveedor
+                navigate('/pagina-proveedor');
                 break;
             case "Soporte":
-                navigate('/pagina-soporte'); // Navega a la página de soporte
+                navigate('/pagina-soporte');
                 break;
+            case 'Usuario':
             default:
-                navigate('/pagina-usuario'); // Navega a la página de inicio por defecto
+                navigate('/pagina-usuario');
+                break;
         }
     };
 
@@ -49,23 +52,23 @@ function Login({ changeView}) {
             setError("La contraseña es obligatoria.");
             return;
         }
+
         try {
             const response = await axios.post('http://localhost:5000/api/Login', { Email, Contraseña: password });
             if (response.status === 200 && response.data && response.data.token) {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('userId', response.data.userId); // Asegúrate de que la clave 'userId' sea la misma que el backend envía.
-                handleLoginResponse(response.data.tipoUsuario); // Llama a la función con la respuesta correcta
+                handleLoginResponse(response.data); // Llama a la función con la respuesta correcta
             } else {
                 setError(response.data.message);
             }
         } catch (err) {
             setError(err.response && err.response.data && err.response.data.message ? err.response.data.message : 'Error al intentar iniciar sesión. Por favor intenta nuevamente.');
         }
-    
     };
+
     const navigateToRegister = () => {
         changeView('Registro');
     };
+
 
     return (
         <div>

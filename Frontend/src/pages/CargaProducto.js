@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback, useRef } from 'react';
+import React, { useState, useContext, useCallback, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../components/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -34,6 +34,7 @@ function CargaProducto() {
     const [modalText, setModalText] = useState('');
     const [displayPrecio, setDisplayPrecio] = useState('');
     const [isProductFormDisabled, setIsProductFormDisabled] = useState(false);
+    
 
     const handlePrecioBlur = (e) => {
         const { value } = e.target;
@@ -72,6 +73,13 @@ function CargaProducto() {
             )
         }));
     }, []);
+    useEffect(() => {
+        if (!usuario) {
+            console.log("Usuario no logueado");
+            // Aquí puedes redirigir al usuario a la página de inicio de sesión o mostrar un mensaje
+        }
+    }, [usuario]);
+
 
     const agregarTalla = useCallback(() => {
         setFormData(prevState => ({
@@ -113,6 +121,11 @@ function CargaProducto() {
     // Función para enviar el producto
     const handleSendProducto = async (event) => {
         event.preventDefault();
+        if (!usuario) {
+            setShowModal(true);
+            setModalText('Debes iniciar sesión para cargar un producto.');
+            return;
+        }
         if (validateFields()) {
             // Creamos una instancia de FormData
             const formDataToSend = new FormData();
@@ -137,6 +150,7 @@ function CargaProducto() {
 
                 const productoId = response.data.id; // Asumiendo que la respuesta del servidor incluye el ID
                 if (productoId) {
+                    console.log(`ID del producto recibido: ${productoId}`);
                     setProductoID(productoId);
                     setProductoEnviado(true);
                     setShowModal(true);
