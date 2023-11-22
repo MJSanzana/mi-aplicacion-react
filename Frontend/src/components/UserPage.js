@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Nav, NavItem, NavLink } from 'reactstrap';
 import Productos from '../pages/Productos';
 import Colegios from '../pages/Colegios';
@@ -10,8 +11,9 @@ import Nosotros from '../pages/Nosotros';
 import Soporte from '../pages/Soporte';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function UserPage() {
+function UserPage(cha) {
     const [currentView, setCurrentView] = useState('Home');
+    const navigate = useNavigate();
 
     const changeView = (view) => {
         setCurrentView(view);
@@ -89,7 +91,7 @@ function UserPage() {
             {currentView === 'Productos' && <Productos changeView={changeView} />}
             {currentView === 'Colegios' && <Colegios />}
             {currentView === 'ShoppingCart' && <ShoppingCart />}
-            {currentView === 'Login' && <Login changeView={changeView} />}
+            {currentView === 'Login' && <Login changeView={changeView} navigate={navigate} />}
             {currentView === 'Registro' && <Registro changeView={changeView} />}
             {currentView === 'Nosotros' && <Nosotros />}
             {currentView === 'Soporte' && <Soporte />}
@@ -98,6 +100,3 @@ function UserPage() {
 }
 
 export default UserPage;
-
-
-
