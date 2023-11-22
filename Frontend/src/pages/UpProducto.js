@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, Button, Alert } from 'react-bootstrap';
+import { Table, Button, Alert, Modal, Form } from 'react-bootstrap';
 
 function UpProducto() {
     const [products, setProducts] = useState([]);
@@ -11,15 +11,15 @@ function UpProducto() {
     const [showTooltip, setShowTooltip] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
     const [tooltipTimeout, setTooltipTimeout] = useState(null);
+    const [showRejectionModal, setShowRejectionModal] = useState(false);
+    const [rejectionMessage, setRejectionMessage] = useState('');
+    const [selectedProductId, setSelectedProductId] = useState(null);
 
     const handleMouseEnter = (imageName, event) => {
         if (tooltipTimeout) {
             clearTimeout(tooltipTimeout);
             setTooltipTimeout(null);
         }
-
-        //const invertedImageName = imageName.replace(/\//g, '\\');
-        //console.log("Imagen invertida:", invertedImageName);
 
         const imageUrl = `http://localhost:5000/${imageName}`;
         const linkPosition = event.target.getBoundingClientRect();
@@ -94,7 +94,7 @@ function UpProducto() {
         setIsApproving(true);
         const productsToApprove = Object.keys(selectedProducts)
             .filter(key => selectedProducts[key])
-            .map(Number); // Asegúrate de que los IDs sean números si así lo requiere tu backend.
+            .map(Number);
 
         if (productsToApprove.length === 0) {
             setError('No hay productos seleccionados para aprobar.');
@@ -114,6 +114,35 @@ function UpProducto() {
         } finally {
             setIsApproving(false);
         }
+    };
+
+    const handleRejectClick = (productoId) => {
+        setSelectedProductId(productoId);
+        setShowRejectionModal(true);
+    };
+
+    const handleRejectSubmit = () => {
+        if (!rejectionMessage.trim()) {
+            setError('Por favor, escribe un mensaje de rechazo.');
+            return;
+        }
+
+        setIsApproving(true);
+        axios.patch(`http://localhost:5000/api/productos/rechazar/${selectedProductId}`, {
+            Mensaje: rejectionMessage,
+            Emisor_Id: 11
+        })
+            .then(response => {
+                fetchProducts();
+                setShowRejectionModal(false);
+            })
+            .catch(err => {
+                console.error("Error durante el rechazo:", err);
+                setError('Error al rechazar el producto.');
+            })
+            .finally(() => {
+                setIsApproving(false);
+            });
     };
 
     return (
@@ -178,28 +207,51 @@ function UpProducto() {
                                     {isApproving && selectedProducts[producto.Id] ? 'Aprobando...' : 'Aprobar'}
                                 </Button>
                             </td>
+                            <td>
+                                <Button variant="warning" onClick={() => handleRejectClick(producto.Id)}>Rechazar</Button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </Table>
             <Button
                 variant="secondary"
-                onClick={() => handleSelectAllProducts(true)} // Esto marcará todos los productos como seleccionados
+                onClick={() => handleSelectAllProducts(true)}
                 disabled={isApproving}
             >
                 Seleccionar Todos
             </Button>
             <Button
                 variant="secondary"
-                onClick={() => handleSelectAllProducts(false)} // Esto desmarcará todos los productos
+                onClick={() => handleSelectAllProducts(false)}
                 disabled={isApproving}
                 style={{ marginLeft: '10px' }}
             >
                 Deseleccionar Todos
             </Button>
+            <Modal show={showRejectionModal} onHide={() => setShowRejectionModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Rechazar Producto</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label>Mensaje para el proveedor:</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={rejectionMessage}
+                            onChange={(e) => setRejectionMessage(e.target.value)}
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowRejectionModal(false)}>Cerrar</Button>
+                    <Button variant="danger" onClick={handleRejectSubmit}>Enviar Rechazo</Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }
 
 export default UpProducto;
-//para no perder cambios
+
