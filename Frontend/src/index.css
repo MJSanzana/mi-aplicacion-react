@@ -47,9 +47,10 @@ body {
   color: rgb(0, 0, 0);
 }
 
-.container {
+/* Elimina esto si no quieres un margen superior global en los contenedores */
+/* .container {
   margin-top: 50px;
-}
+} */
 
 .rounded-card-parent {
   display: flex;
