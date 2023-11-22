@@ -100,3 +100,37 @@ exports.obtenerProductosPorProveedor = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.aprobarProductosMultiples = async (req, res) => {
+    try {
+        const { productosIds } = req.body; // Supongamos que envías un array de IDs de productos a aprobar
+
+        if (!productosIds || !Array.isArray(productosIds) || productosIds.length === 0) {
+            return res.status(400).json({ error: 'No se proporcionaron productos para aprobar.' });
+        }
+
+        const productosToUpdate = [];
+
+        // Verifica si los productos existen y si no están aprobados
+        for (const productoId of productosIds) {
+            const producto = await db.query('SELECT * FROM Productos WHERE id = ? AND Aprobado = 0', [productoId]);
+            if (producto.length === 1) {
+                productosToUpdate.push(productoId);
+            }
+        }
+
+        if (productosToUpdate.length === 0) {
+            return res.status(400).json({ error: 'No se encontraron productos válidos para aprobar.' });
+        }
+
+        // Realiza la actualización de aprobación en la base de datos
+        const sqlUpdate = 'UPDATE Productos SET Aprobado = 1 WHERE id IN (?)';
+        await db.query(sqlUpdate, [productosToUpdate]);
+
+        // Responde con un mensaje de éxito
+        return res.status(200).json({ message: 'Productos aprobados exitosamente.' });
+    } catch (error) {
+        console.error("Error durante la aprobación de múltiples productos:", error);
+        return res.status(500).json({ error: 'Error durante la aprobación de los productos.' });
+    }
+};

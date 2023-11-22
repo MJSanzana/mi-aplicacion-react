@@ -40,6 +40,7 @@ router.get('/ObtenerProductos/:userId', productosController.obtenerProductosPorP
 router.post('/CreateProducts', productosController.crearProducto);
 router.put('/aprobado/:id', productosController.updateProductApproval);
 router.get('/productos/pendientes', productosController.getProductosPendientes);
+router.patch('/api/aprobado/multiple', productosController.aprobarProductosMultiples);
 
 // Rutas para ProductosVariantes
 router.get('/productosvariantes', productosVariantesController.obtenerVariantes);
