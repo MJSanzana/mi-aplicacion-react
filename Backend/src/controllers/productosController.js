@@ -1,6 +1,7 @@
 //productosController.js
 const multer = require('multer');
 const db = require('../api/routes/db/db');
+const {pool, query} = require ('../api/routes/db/db')
 
 // Configuración de Multer para almacenar imágenes en el servidor
 const storage = multer.diskStorage({
@@ -133,4 +134,63 @@ exports.aprobarProductosMultiples = async (req, res) => {
         console.error("Error durante la aprobación de múltiples productos:", error);
         return res.status(500).json({ error: 'Error durante la aprobación de los productos.' });
     }
+};
+
+exports.rechazarProducto = async (req, res) => {
+    const { Producto_Id } = req.params;
+    const { Mensaje, Emisor_Id } = req.body;
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            console.error('Error obteniendo conexión:', err);
+            return res.status(500).json({ error: 'Error interno del servidor al obtener conexión.' });
+        }
+
+        connection.beginTransaction(async (err) => {
+            if (err) {
+                connection.release();
+                console.error('Error comenzando transacción:', err);
+                return res.status(500).json({ error: 'Error interno del servidor al comenzar transacción.' });
+            }
+
+            try {
+                // Marcar el producto como rechazado
+                const sqlProductoRechazado = 'UPDATE Productos SET Aprobado = ?, Estado = ? WHERE Id = ?';
+                await query(sqlProductoRechazado, [0, 'rechazado', Producto_Id]);
+                
+                // Encuentra el ID del proveedor asociado con el producto
+                const sqlProveedor = 'SELECT Proveedor_Id FROM ProveedoresProductos WHERE Producto_Id = ?';
+                const proveedorResult = await query(sqlProveedor, [Producto_Id]);
+                if (proveedorResult.length === 0) {
+                    throw new Error('Proveedor no encontrado para el producto.');
+                }
+                const Receptor_Id = proveedorResult[0].Proveedor_Id;
+
+                // Insertar el mensaje en la tabla de mensajes
+                const sqlInsertMensaje = 'INSERT INTO Mensajes (Emisor_Id, Receptor_Id, Producto_Id, Mensaje, Leido) VALUES (?, ?, ?, ?, ?)';
+                await query(sqlInsertMensaje, [Emisor_Id, Receptor_Id, Producto_Id, Mensaje, 0]);
+
+                // Commit the transaction
+                connection.commit((err) => {
+                    if (err) {
+                        connection.rollback(() => {
+                            connection.release();
+                        });
+                        console.error('Error haciendo commit de transacción:', err);
+                        return res.status(500).json({ error: 'Error interno del servidor al hacer commit de transacción.' });
+                    }
+
+                    connection.release();
+                    res.status(200).json({ message: 'Producto rechazado y mensaje enviado al proveedor.' });
+                });
+            } catch (error) {
+                // Si hay un error, rollback de la transacción
+                connection.rollback(() => {
+                    connection.release();
+                });
+                console.error('Error en la transacción:', error);
+                res.status(500).json({ error: error.message });
+            }
+        });
+    });
 };

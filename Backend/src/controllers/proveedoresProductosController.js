@@ -30,7 +30,7 @@ exports.crearProveedorProducto = async (req, res) => {
     }
 };
 
-exports.obtenerProductosPorProveedor = async (req, res) => {
+exports.obtenerProductosPorProveedorId = async (req, res) => {
     const proveedorId = req.params.userId;
 
     try {

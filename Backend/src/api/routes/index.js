@@ -41,6 +41,7 @@ router.post('/CreateProducts', productosController.crearProducto);
 router.put('/aprobado/:id', productosController.updateProductApproval);
 router.get('/productos/pendientes', productosController.getProductosPendientes);
 router.patch('/aprobado/multiple', productosController.aprobarProductosMultiples);
+router.patch('/productos/rechazar/:id', productosController.rechazarProducto);
 
 // Rutas para ProductosVariantes
 router.get('/productosvariantes', productosVariantesController.obtenerVariantes);
@@ -51,6 +52,8 @@ router.put('/actualizarVariante', productosVariantesController.actualizarVariant
 // Rutas para ProveedoresProductos
 router.get('/proveedoresproductos', proveedoresProductosController.obtenerProveedoresProductos);
 router.post('/proveedoresproductos', proveedoresProductosController.crearProveedorProducto);
+router.get('/proveedoresproductos/:userId', proveedoresProductosController.obtenerProductosPorProveedorId);
+
 
 // Rutas para crear ticket soporte
 router.post('/createTicket', ticketsController.createTicket);
