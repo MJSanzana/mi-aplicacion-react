@@ -137,7 +137,7 @@ exports.aprobarProductosMultiples = async (req, res) => {
 };
 
 exports.rechazarProducto = async (req, res) => {
-    const { Producto_Id } = req.params;
+    const Producto_Id = req.params.id;
     const { Mensaje, Emisor_Id } = req.body;
 
     pool.getConnection((err, connection) => {
