@@ -9,41 +9,45 @@ function UpProducto() {
     const [isApproving, setIsApproving] = useState(false);
     const [tooltipImage, setTooltipImage] = useState("");
     const [showTooltip, setShowTooltip] = useState(false);
-    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 }); // Estado para la posición del tooltip
+    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 }); 
+    const [tooltipTimeout, setTooltipTimeout] = useState(null);
 
-    // Maneja el evento onMouseEnter
     const handleMouseEnter = (imageName, event) => {
-        // Reemplaza los slashes normales con slashes invertidos solo para mostrar
-        const invertedImageName = imageName.replace(/\//g, '\\');
+        if (tooltipTimeout) {
+            clearTimeout(tooltipTimeout);
+            setTooltipTimeout(null);
+        }
 
-        console.log("Imagen invertida:", invertedImageName);
+        //const invertedImageName = imageName.replace(/\//g, '\\');
+        //console.log("Imagen invertida:", invertedImageName);
 
         const imageUrl = `http://localhost:5000/${imageName}`;
-
-        // Obtén la posición del enlace
         const linkPosition = event.target.getBoundingClientRect();
-
-        // Calcula la posición del tooltip
-        const tooltipPosition = {
+        const newTooltipPosition = {
             top: linkPosition.top + window.scrollY,
             left: linkPosition.left + window.scrollX + linkPosition.width / 2,
         };
 
-        setTooltipPosition(tooltipPosition);
+        setTooltipPosition(newTooltipPosition);
         setTooltipImage(imageUrl);
         setShowTooltip(true);
-        console.log("Imagen recibida:", imageName);
     };
 
-
-    // Maneja el evento onMouseLeave
     const handleMouseLeave = () => {
-        setShowTooltip(false);
+        const timeout = setTimeout(() => {
+            setShowTooltip(false);
+        }, 300);
+        setTooltipTimeout(timeout);
     };
 
     useEffect(() => {
         fetchProducts();
-    }, []);
+        return () => {
+            if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+            }
+        };
+    }, [tooltipTimeout]);
 
     const fetchProducts = () => {
         axios.get('http://localhost:5000/api/productos/pendientes')
@@ -51,7 +55,6 @@ function UpProducto() {
                 setProducts(response.data);
             })
             .catch(err => {
-                console.error("Hubo un error al obtener los productos pendientes:", err);
                 setError('Hubo un error al cargar los productos pendientes.');
             });
     };
