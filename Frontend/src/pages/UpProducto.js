@@ -9,7 +9,7 @@ function UpProducto() {
     const [isApproving, setIsApproving] = useState(false);
     const [tooltipImage, setTooltipImage] = useState("");
     const [showTooltip, setShowTooltip] = useState(false);
-    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 }); 
+    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
     const [tooltipTimeout, setTooltipTimeout] = useState(null);
 
     const handleMouseEnter = (imageName, event) => {
@@ -76,37 +76,44 @@ function UpProducto() {
     };
 
     const handleSelectProduct = (productoId, isSelected) => {
-        setSelectedProducts(prev => ({
-            ...prev,
+        setSelectedProducts(prevSelectedProducts => ({
+            ...prevSelectedProducts,
             [productoId]: isSelected
         }));
     };
 
     const handleSelectAllProducts = (isSelected) => {
         const newSelectedProducts = {};
-        products.forEach((producto) => {
-            newSelectedProducts[producto.Id] = isSelected;
+        products.forEach((product) => {
+            newSelectedProducts[product.Id] = isSelected;
         });
         setSelectedProducts(newSelectedProducts);
     };
 
-    const handleBulkApproval = () => {
+    const handleBulkApproval = async () => {
         setIsApproving(true);
+        const productsToApprove = Object.keys(selectedProducts)
+            .filter(key => selectedProducts[key])
+            .map(Number); // Asegúrate de que los IDs sean números si así lo requiere tu backend.
 
-        const productsToApprove = Object.keys(selectedProducts).filter(key => selectedProducts[key]);
+        if (productsToApprove.length === 0) {
+            setError('No hay productos seleccionados para aprobar.');
+            setIsApproving(false);
+            return;
+        }
 
-        axios.patch(`http://localhost:5000/api/aprobado/multiple`, { productsToApprove })
-            .then(response => {
-                console.log(response.data.message);
-                fetchProducts();
-            })
-            .catch(err => {
-                console.error("Error durante la aprobación:", err);
-                setError('Error durante la aprobación de los productos.');
-            })
-            .finally(() => {
-                setIsApproving(false);
+        try {
+            const response = await axios.patch('http://localhost:5000/api/aprobado/multiple', {
+                productosIds: productsToApprove
             });
+            console.log(response.data.message);
+            fetchProducts();
+        } catch (err) {
+            console.error("Error durante la aprobación:", err);
+            setError('Error durante la aprobación de los productos.');
+        } finally {
+            setIsApproving(false);
+        }
     };
 
     return (
@@ -177,14 +184,14 @@ function UpProducto() {
             </Table>
             <Button
                 variant="secondary"
-                onClick={() => handleSelectAllProducts(true)}
+                onClick={() => handleSelectAllProducts(true)} // Esto marcará todos los productos como seleccionados
                 disabled={isApproving}
             >
                 Seleccionar Todos
             </Button>
             <Button
                 variant="secondary"
-                onClick={() => handleSelectAllProducts(false)}
+                onClick={() => handleSelectAllProducts(false)} // Esto desmarcará todos los productos
                 disabled={isApproving}
                 style={{ marginLeft: '10px' }}
             >
