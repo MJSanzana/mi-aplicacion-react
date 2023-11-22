@@ -24,7 +24,7 @@ app.use(express.static('public'));
 
 // Configuración de CORS
 app.use(cors({
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     // ... otras opciones de CORS si las necesitas
 }));
 
