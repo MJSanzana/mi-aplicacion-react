@@ -3,15 +3,16 @@ const db = require('../api/routes/db/db');
 
 // Endpoint para obtener los mensajes del usuario actual
 exports.obtenerMensajes = async (req, res) => {
-    const usuarioId = req.params.usuarioId; // Debes obtener el ID del usuario actual desde la solicitud
-    
+    const usuarioId = req.params.UsuarioId; // El nombre del parámetro debe coincidir con el definido en la ruta
+    console.log("Usuario ID recibido:", usuarioId);
+
     try {
-        // Realiza una consulta para obtener los mensajes del usuario actual
         const sqlQuery = 'SELECT * FROM Mensajes WHERE Receptor_Id = ?';
         const mensajes = await db.query(sqlQuery, [usuarioId]);
-
+        //console.log("Mensajes obtenidos:", mensajes);
         res.json(mensajes);
     } catch (error) {
+        console.error("Error en la obtención de mensajes:", error);
         res.status(500).json({ error: error.message });
     }
 };
