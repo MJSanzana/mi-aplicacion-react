@@ -23,6 +23,9 @@ function Login({ changeView }) {
         login(userData); // Actualiza el estado global de autenticación con la función login del AuthContext
         // Redirige al usuario a su página correspondiente
         switch (userData.tipoUsuario) {
+            case "Usuario":
+                navigate('/');
+                break;
             case "Administrador":
                 navigate('/pagina-administrador');
                 break;

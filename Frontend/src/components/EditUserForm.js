@@ -1,8 +1,10 @@
 // EditUserForm.js
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { AuthContext } from '../components/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome } from '@fortawesome/free-solid-svg-icons';
 
 function EditUserForm() {
     const { user } = useContext(AuthContext);
@@ -20,6 +22,7 @@ function EditUserForm() {
     const [newPassword, setNewPassword] = useState('');
     const [repeatNewPassword, setRepeatNewPassword] = useState('');
     const [error, setError] = useState(null);
+    const homePath = '/pagina-usuario'; 
 
     useEffect(() => {
         if (user && user.userId) {
@@ -73,6 +76,9 @@ function EditUserForm() {
 
     return (
         <div className="container mt-5">
+                        <Link to={homePath} className="btn btn-secondary mb-3">
+                <FontAwesomeIcon icon={faHome} /> Inicio
+            </Link>
             <h3 className="mb-3">Editar Usuario</h3>
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit}>

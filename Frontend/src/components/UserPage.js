@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext  } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Nav, NavItem, NavLink } from 'reactstrap';
+import { AuthContext } from './AuthContext';
 import Productos from '../pages/Productos';
 import Colegios from '../pages/Colegios';
 import ShoppingCart from '../pages/ShoppingCart';
@@ -17,10 +18,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function UserPage() {
     const [currentView, setCurrentView] = useState('Home');
     const navigate = useNavigate();
+    const { usuario } = useContext(AuthContext);
 
     // Supongamos que este estado representa si el usuario está logueado
-    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false); // Cambiar a true cuando el usuario inicie sesión
-
+    const isUserLoggedIn = usuario && usuario.userId; 
 
     const changeView = (view) => {
         setCurrentView(view);
@@ -31,9 +32,13 @@ function UserPage() {
         verticalAlign: 'middle' // Alinea verticalmente la imagen y el texto
     };
     const goToEditProfile = () => {
-        // Redirige al usuario a la página de edición de perfil
-        navigate('/edit-user');
+        if (usuario && usuario.userId) {
+            navigate(`/edit-user/${usuario.userId}`);
+        } else {
+            // Manejar el caso en que el usuario no esté logueado o no tenga un ID
+        }
     };
+
 
     return (
         <div>
