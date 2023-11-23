@@ -101,10 +101,10 @@ function ShoppingCart() {
                         </ListGroupItem>
                     </ListGroup>
                     </Col>
-                    <div className="input-field col-2 offset-9 mb-2">
+                    <div className="input-field col-3 offset-8 mb-2">
                     <Button color="danger" block onClick={clearCart}>Vaciar Carrito</Button>
                     </div>
-                    <div className="input-field col-2 offset-9 mb-2">
+                    <div className="input-field col-3 offset-8 mb-2">
                     <Button color="primary" block>Pagar</Button>
                     </div>
                     

@@ -4,6 +4,7 @@ import { AuthContext } from '../components/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import CargaColegio from '../pages/CargaColegio';
 import UpProducto from '../pages/UpProducto';
+import Mensajes from './Mensajes';
 import { Nav, NavItem, NavLink } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -45,11 +46,21 @@ function AdminPage() {
                         Aprobar Producto
                     </NavLink>
                 </NavItem>
+                <NavItem>
+                    <NavLink
+                        active={currentView === 'Mensajes'}
+                        onClick={() => setCurrentView('Mensajes')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        Mensajes
+                    </NavLink>
+                </NavItem>
             </Nav>
 
             {/* Renderizado condicional de componentes */}
             {currentView === 'UpProducto' && <UpProducto />}
             {currentView === 'CargaColegio' && <CargaColegio />}
+            {currentView === 'Mensajes' && <Mensajes />} {/* Agrega esta línea */}
         </div>
     );
 }
