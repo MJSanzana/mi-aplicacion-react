@@ -10,7 +10,18 @@ function Mensajes() {
     const [isLoading, setIsLoading] = useState(true);
     const [nuevoMensaje, setNuevoMensaje] = useState('');
     const [mensajeAResponder, setMensajeAResponder] = useState(null);
+    const [nombresUsuarios, setNombresUsuarios] = useState({});
     const isMounted = useRef(true);
+
+    const obtenerNombreUsuarioPorId = async (userId) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/Users/${userId}`);
+            return response.data.NombreUsuario; // Asume que la respuesta tiene una propiedad NombreUsuario
+        } catch (error) {
+            console.error('Error al obtener el nombre del usuario', error);
+            return 'Desconocido'; // Nombre por defecto en caso de error
+        }
+    };
 
     const cargarMensajes = async () => {
         if (isMounted.current && usuario?.userId) {
@@ -18,9 +29,18 @@ function Mensajes() {
             try {
                 const enviados = await axios.get(`http://localhost:5000/api/mensajes/enviados/${usuario.userId}`);
                 const recibidos = await axios.get(`http://localhost:5000/api/mensajes/usuario/${usuario.userId}`);
-
-                console.log('Mensajes Enviados:', enviados.data);
-                console.log('Mensajes Recibidos:', recibidos.data);
+                const nombres = {};
+                // Obtener nombres de los emisores y receptores de los mensajes
+                const idsUsuarios = new Set([...enviados.data, ...recibidos.data].map(m => [m.Emisor_Id, m.Receptor_Id]).flat());
+                const promesasNombres = Array.from(idsUsuarios).map(id => obtenerNombreUsuarioPorId(id));
+                const resultadosNombres = await Promise.all(promesasNombres);
+        
+                // Asignar nombres obtenidos a su respectivo ID
+                Array.from(idsUsuarios).forEach((id, index) => {
+                    nombres[id] = resultadosNombres[index];
+                });
+        
+                setNombresUsuarios(nombres);
 
                 if (Array.isArray(enviados.data) && Array.isArray(recibidos.data)) {
                     setMensajesEnviados(enviados.data);
@@ -50,6 +70,7 @@ function Mensajes() {
     useEffect(() => {
         console.log('Mensaje a responder:', mensajeAResponder);
     }, [mensajeAResponder]);
+
 
 
     const responderMensaje = async (mensajeParaResponder) => {
@@ -99,7 +120,7 @@ function Mensajes() {
                 {!isLoading && mensajesRecibidos.map((mensaje) => (
                     <div key={mensaje.Id} className="card mb-2">
                         <div className="card-body">
-                            <p className="card-text"><strong>De:</strong> {mensaje.Emisor_Id}</p>
+                        <p className="card-text"><strong>De:</strong> {nombresUsuarios[mensaje.Emisor_Id]}</p>
                             <p className="card-text"><strong>Mensaje:</strong> {mensaje.Mensaje}</p>
                             <button className="btn btn-secondary" onClick={() => marcarComoLeido(mensaje.Id)}>Marcar como Leído</button>
                             <button className="btn btn-primary" onClick={() => setMensajeAResponder(mensaje)}>Responder</button>
@@ -131,6 +152,7 @@ function Mensajes() {
                 {!isLoading && mensajesEnviados.map((mensaje) => (
                     <div key={mensaje.Id} className="card mb-2">
                         <div className="card-body">
+                        <p className="card-text"><strong>Para:</strong> {nombresUsuarios[mensaje.Receptor_Id]}</p>
                             <p className="card-text"><strong>Para:</strong> {mensaje.Receptor_Id}</p>
                             <p className="card-text"><strong>Mensaje:</strong> {mensaje.Mensaje}</p>
                             {mensaje.Respuesta && (
