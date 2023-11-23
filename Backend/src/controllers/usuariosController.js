@@ -94,11 +94,11 @@ exports.loginUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   const {
     NombreUsuario, Apellido, Email, Contraseña,
-    Perfil_Imagen, Documento_Numero, Celular_Numero,
+    Documento_Numero, Celular_Numero,
     Direccion, Comuna
   } = req.body;
 
-  if (!NombreUsuario || !Apellido || !Email || !Perfil_Imagen || !Documento_Numero || !Celular_Numero || !Direccion || !Comuna) {
+  if (!NombreUsuario || !Apellido || !Email || !Documento_Numero || !Celular_Numero || !Direccion || !Comuna) {
     return res.status(400).json({ error: "Todos los campos son obligatorios." });
   }
 
@@ -112,8 +112,8 @@ exports.updateUser = async (req, res) => {
       hashedPassword = currentUser.Contraseña;
     }
 
-    await db.query('UPDATE Usuarios SET NombreUsuario = ?, Apellido = ?, Email = ?, Contraseña = ?, Perfil_Imagen = ?, Documento_Numero = ?, Celular_Numero = ?, Direccion = ?, Comuna = ? WHERE Id = ?',
-      [NombreUsuario, Apellido, Email, hashedPassword, Perfil_Imagen, Documento_Numero, Celular_Numero, Direccion, Comuna, req.params.id]);
+    await db.query('UPDATE Usuarios SET NombreUsuario = ?, Apellido = ?, Email = ?, Contraseña = ?, Documento_Numero = ?, Celular_Numero = ?, Direccion = ?, Comuna = ? WHERE Id = ?',
+      [NombreUsuario, Apellido, Email, hashedPassword,Documento_Numero, Celular_Numero, Direccion, Comuna, req.params.id]);
 
     res.json({ message: 'Usuario actualizado con éxito' });
   } catch (err) {
