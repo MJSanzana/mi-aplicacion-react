@@ -68,7 +68,7 @@ router.post('/Login', usuariosController.loginUser);
 router.put('/EditUsers/:id', usuariosController.updateUser); 
 router.post('/deactivate/:id', usuariosController.deactivateUser); 
 router.post('/reactivate/:id', usuariosController.reactivateUser); 
-router.put('/cambiar-contraseña/:id', usuariosController.changeUserPassword);
+router.put('/cambiar-contrasena/:id', usuariosController.changeUserPassword);
 
 // Rutas para Pedidos
 router.post('/pedidos', pedidosController.crearPedido);
