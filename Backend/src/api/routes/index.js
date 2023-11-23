@@ -18,6 +18,7 @@ const pagosController = require('../../controllers/pagosController');
 const configuracionPagoController = require('../../controllers/configuracionPagoController');
 const logPagosController = require('../../controllers/logPagosController');
 const verificarAutenticacion = require('../../middlewares/verificarAutenticacion');
+const mensajesController = require('../../controllers/mensajesController')
 
 //Obtener todos los colegios
 router.get('/getAllColegios', colegioController.getAllColegios);
@@ -110,5 +111,12 @@ router.get('/configuracionpago', configuracionPagoController.obtenerConfiguracio
 // Rutas para Log de Pagos
 router.post('/logpagos', logPagosController.registrarEventoPago);
 router.get('/logpagos', logPagosController.obtenerLogPagos);
+
+//Rutas para mensajeria 
+
+router.get('/mensajes/usuario/:UsuarioId', mensajesController.obtenerMensajes);
+router.put('/mensajes/marcar-leido/:mensajeId', mensajesController.marcarMensajeLeido);
+router.post('/mensajes/crear', mensajesController.crearMensaje);
+router.get('/mensajes/enviados/:emisorId', mensajesController.obtenerMensajesEnviados);
 
 module.exports = router;
