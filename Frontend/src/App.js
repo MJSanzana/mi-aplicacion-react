@@ -10,6 +10,8 @@ import UserPage from './components/UserPage';
 import AdminPage from './components/AdminPage';
 import ProviderPage from './components/ProviderPage';
 import SupportPage from './components/SupportPage';
+import EditUserForm from './components/EditUserForm';
+
 
 function App() {
   return (
@@ -21,7 +23,7 @@ function App() {
             <Route path="/pagina-administrador" element={<AdminPage />} />
             <Route path="/pagina-proveedor" element={<ProviderPage />} />
             <Route path="/pagina-soporte" element={<SupportPage />} />
-            {/* Puedes agregar más rutas según sea necesario */}
+            <Route path="/edit-user/:userId" element = {< EditUserForm />}/>
           </Routes>
       </Router>
     </AuthProvider>

@@ -143,5 +143,22 @@ exports.reactivateUser = async (req, res) => {
   }
 };
 
+//Cambio de contraseña
+exports.changeUserPassword = async (req, res) => {
+  const userId = req.params.id;
+  const { nuevaContraseña } = req.body;
 
+  if (!nuevaContraseña) {
+    return res.status(400).json({ error: "La nueva contraseña es obligatoria." });
+  }
 
+  try {
+    const hashedPassword = await bcrypt.hash(nuevaContraseña, 10);
+
+    await db.query('UPDATE Usuarios SET Contraseña = ? WHERE Id = ?', [hashedPassword, userId]);
+
+    res.json({ message: 'Contraseña actualizada con éxito' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
