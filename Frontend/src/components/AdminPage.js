@@ -77,7 +77,7 @@ function AdminPage() {
             {/* Renderizado condicional de componentes */}
             {currentView === 'UpProducto' && <UpProducto />}
             {currentView === 'CargaColegio' && <CargaColegio />}
-            {currentView === 'Mensajes' && <Mensajes />} {/* Agrega esta línea */}
+            {currentView === 'Mensajes' && <Mensajes />} 
         </div>
     );
 }
