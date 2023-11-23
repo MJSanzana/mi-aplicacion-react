@@ -10,15 +10,30 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function AdminPage() {
     const [currentView, setCurrentView] = useState('UpProducto');
-    const { usuario } = useContext(AuthContext);
+    const { usuario, setUsuario } = useContext(AuthContext);
     const navigate = useNavigate();
+    
 
     useEffect(() => {
-        // Si no hay usuario autenticado o si el tipo de usuario no es Administrador, redirigir
+        // Este bloque es para la redirección si el usuario no está autenticado o no es un administrador
         if (!usuario || usuario.tipoUsuario !== 'Administrador') {
             navigate('/pagina-usuario'); // o a la ruta de inicio de sesión o página principal
+        } else if (usuario && !usuario.NombreUsuario) {
+            // Este bloque es para obtener el nombre del usuario
+            const obtenerNombreUsuario = async () => {
+                try {
+                    const response = await fetch('/api/usuario/' + usuario.userId);
+                    const datosUsuario = await response.json();
+                    localStorage.setItem('NombreUsuario', datosUsuario.NombreUsuario);
+                    setUsuario(prev => ({ ...prev, NombreUsuario: datosUsuario.NombreUsuario }));
+                } catch (error) {
+                    console.error('Hubo un error al obtener el nombre del usuario:', error);
+                }
+            };
+
+            obtenerNombreUsuario();
         }
-    }, [usuario, navigate]);
+    }, [usuario, navigate, setUsuario]);
 
     const changeView = (view) => {
         setCurrentView(view);
@@ -26,7 +41,9 @@ function AdminPage() {
 
     return (
         <div>
-            <h1 className="my-4 text-center">Bienvenido administrador</h1>
+            <h3 className="my-4 text-center">
+                Bienvenido {usuario && usuario.NombreUsuario ? usuario.NombreUsuario : 'administrador'}
+            </h3>
             <Nav tabs className="justify-content-center mb-4">
                 <NavItem>
                     <NavLink

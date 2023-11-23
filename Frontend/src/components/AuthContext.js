@@ -8,8 +8,9 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
         const tipoUsuario = localStorage.getItem('tipoUsuario');
+        const NombreUsuario = localStorage.getItem('NombreUsuario'); 
         // Devuelve el usuario si todos los valores están presentes
-        return token && userId && tipoUsuario ? { token, userId, tipoUsuario } : null;
+        return token && userId && tipoUsuario ? { token, userId, tipoUsuario, NombreUsuario } : null;
     });
 
     useEffect(() => {
@@ -37,11 +38,13 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', datosUsuario.token);
         localStorage.setItem('userId', datosUsuario.userId);
         localStorage.setItem('tipoUsuario', datosUsuario.tipoUsuario);
+        localStorage.setItem('NombreUsuario', datosUsuario.NombreUsuario); 
         
         setUsuario({
             userId: datosUsuario.userId,
             tipoUsuario: datosUsuario.tipoUsuario,
-            token: datosUsuario.token
+            token: datosUsuario.token,
+            NombreUsuario: datosUsuario.NombreUsuario 
         });
     };
 
@@ -53,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ usuario, login, logout }}>
+        <AuthContext.Provider value={{ usuario, login, logout, setUsuario }}>
             {children}
         </AuthContext.Provider>
     );

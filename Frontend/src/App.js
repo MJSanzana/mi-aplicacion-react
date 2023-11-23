@@ -1,9 +1,9 @@
 // frontend/src/App.js
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { AuthProvider, AuthContext } from './components/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './components/AuthContext';
 
 // Importar tus páginas o componentes aquí
 import UserPage from './components/UserPage';
@@ -16,6 +16,7 @@ function App() {
     <AuthProvider>
       <Router>
           <Routes>
+          <Route path="/" element={<Navigate replace to="/pagina-usuario" />} />
             <Route path="/pagina-usuario" element={<UserPage />} />
             <Route path="/pagina-administrador" element={<AdminPage />} />
             <Route path="/pagina-proveedor" element={<ProviderPage />} />
