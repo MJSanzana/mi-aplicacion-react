@@ -58,7 +58,7 @@ function EditUserForm() {
         // Cambia la contraseña si es necesario
         if (newPassword && newPassword === repeatNewPassword) {
             try {
-                await axios.put(`http://localhost:5000/api/usuarios/cambiar-contraseña/${userId}`, {
+                await axios.put(`http://localhost:5000/api/usuarios/cambiar-contrasena/${userId}`, {
                     nuevaContraseña: newPassword
                 });
                 alert('Contraseña actualizada exitosamente');

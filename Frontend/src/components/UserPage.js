@@ -9,11 +9,18 @@ import Login from './Login';
 import Registro from './Registro';
 import Nosotros from '../pages/Nosotros';
 import Soporte from '../pages/Soporte';
+//import EditUserForm from './EditUserForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserEdit } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function UserPage(cha) {
+function UserPage() {
     const [currentView, setCurrentView] = useState('Home');
     const navigate = useNavigate();
+
+    // Supongamos que este estado representa si el usuario está logueado
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false); // Cambiar a true cuando el usuario inicie sesión
+
 
     const changeView = (view) => {
         setCurrentView(view);
@@ -23,13 +30,28 @@ function UserPage(cha) {
         marginRight: '250px', // Espacio entre la imagen y el texto
         verticalAlign: 'middle' // Alinea verticalmente la imagen y el texto
     };
+    const goToEditProfile = () => {
+        // Redirige al usuario a la página de edición de perfil
+        navigate('/edit-user');
+    };
 
     return (
         <div>
-             <img src="VIASMAE.png" alt="Logo VIASMAE" width="150" style={logoStyle} />
-                <h2 className="my-4 text-center" style={{ backgroundColor: 'light', color: 'black',display: 'inline-block' }}>La Mayor Selección de Uniformes Escolares en Santiago</h2>
+            <img src="VIASMAE.png" alt="Logo VIASMAE" width="150" style={logoStyle} />
+            <h2 className="my-4 text-center" style={{ backgroundColor: 'light', color: 'black', display: 'inline-block' }}>La Mayor Selección de Uniformes Escolares en Santiago</h2>
             <Nav tabs className="justify-content-center mb-4">
-            <NavItem>
+                {/* Tus NavItems aquí */}
+                {isUserLoggedIn && (
+                    <NavItem>
+                        <NavLink
+                            style={{ cursor: 'pointer' }}
+                            onClick={goToEditProfile}
+                        >
+                            <FontAwesomeIcon icon={faUserEdit} /> Editar Perfil
+                        </NavLink>
+                    </NavItem>
+                )}
+                <NavItem>
                     <NavLink
                         active={currentView === 'Home'}
                         onClick={() => setCurrentView('Home')}
@@ -37,8 +59,8 @@ function UserPage(cha) {
                     >
                         Home
                     </NavLink>
-                    </NavItem>
-                    <NavItem>
+                </NavItem>
+                <NavItem>
                     <NavLink
                         active={currentView === 'Soporte'}
                         onClick={() => setCurrentView('Soporte')}
@@ -47,7 +69,7 @@ function UserPage(cha) {
                         Contactanos
                     </NavLink>
                 </NavItem>
-                
+
                 <NavItem>
                     <NavLink
                         active={currentView === 'Productos'}
@@ -74,8 +96,8 @@ function UserPage(cha) {
                     >
                         Carro
                     </NavLink>
-                </NavItem>      
-            <NavItem>
+                </NavItem>
+                <NavItem>
                     <NavLink
                         active={currentView === 'Login'}
                         onClick={() => setCurrentView('Login')}
@@ -84,7 +106,7 @@ function UserPage(cha) {
                         Mi cuenta
                     </NavLink>
                 </NavItem>
-                </Nav>
+            </Nav>
 
             {/* Renderizado condicional de componentes */}
             {currentView === 'Home' && <Home changeView={changeView} />}
