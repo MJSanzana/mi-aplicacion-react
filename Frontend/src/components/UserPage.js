@@ -108,7 +108,7 @@ function UserPage() {
                         onClick={() => setCurrentView('Login')}
                         style={{ cursor: 'pointer' }}
                     >
-                        Mi cuenta
+                        Cuenta
                     </NavLink>
                 </NavItem>
             </Nav>
