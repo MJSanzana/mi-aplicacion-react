@@ -1,4 +1,4 @@
-import React, { useState, useContext  } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Nav, NavItem, NavLink } from 'reactstrap';
 import { AuthContext } from './AuthContext';
@@ -12,16 +12,16 @@ import Nosotros from '../pages/Nosotros';
 import Soporte from '../pages/Soporte';
 //import EditUserForm from './EditUserForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserEdit } from '@fortawesome/free-solid-svg-icons';
+import { faUserEdit, faSignOutAlt  } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function UserPage() {
     const [currentView, setCurrentView] = useState('Home');
     const navigate = useNavigate();
-    const { usuario } = useContext(AuthContext);
+    const { usuario, setUsuario  } = useContext(AuthContext);
 
     // Supongamos que este estado representa si el usuario está logueado
-    const isUserLoggedIn = usuario && usuario.userId; 
+    const isUserLoggedIn = usuario && usuario.userId;
 
     const changeView = (view) => {
         setCurrentView(view);
@@ -38,6 +38,16 @@ function UserPage() {
             // Manejar el caso en que el usuario no esté logueado o no tenga un ID
         }
     };
+    // Función para cerrar sesión
+    const handleLogout = () => {
+        // Realiza cualquier limpieza necesaria (por ejemplo, eliminar tokens de autenticación, etc.)
+        // Luego, actualiza el estado de autenticación a null o un valor vacío en tu contexto
+        setUsuario(null);
+
+        // Redirige al usuario a la página de inicio de sesión o a donde desees
+        navigate('/pagina-usuario'); // Ajusta la ruta según tus necesidades
+    };
+
 
 
     return (
@@ -53,6 +63,16 @@ function UserPage() {
                             onClick={goToEditProfile}
                         >
                             <FontAwesomeIcon icon={faUserEdit} /> Editar Perfil
+                        </NavLink>
+                    </NavItem>
+                )}
+                {isUserLoggedIn && (
+                    <NavItem>
+                        <NavLink
+                            style={{ cursor: 'pointer' }}
+                            onClick={handleLogout} // Llama a la función de cierre de sesión
+                        >
+                            <FontAwesomeIcon icon={faSignOutAlt} /> Cerrar Sesión
                         </NavLink>
                     </NavItem>
                 )}
