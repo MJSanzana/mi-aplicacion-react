@@ -61,5 +61,22 @@ exports.obtenerVariantesPorProductoId = async (req, res) => {
     }
 };
 
+exports.actualizarVarianteId = async (req, res) => {
+    const { producto_id } = req.params;
+    const { talla, cantidad } = req.body;
+    try {
+        // Primero, verifica si ya existe una fila con el mismo producto_id y talla
+        const [existente] = await db.query('SELECT * FROM ProductosVariantes WHERE Producto_Id = ? AND Talla = ?', [producto_id, talla]);
 
-
+        if (existente) {
+            // Si ya existe, suma la cantidad proporcionada a la cantidad actual
+            await db.query('UPDATE ProductosVariantes SET Cantidad = Cantidad + ? WHERE Producto_Id = ? AND Talla = ?', [cantidad, producto_id, talla]);
+            res.status(200).json({ message: "Stock actualizado con éxito" });
+        } else {
+            // Si no existe, envía un mensaje de error
+            res.status(404).json({ message: "Variante no encontrada" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

@@ -6,12 +6,16 @@ const getImageUrl = (imageName) => {
   return `http://localhost:5000/${imageName}`;
 };
 
-function Productos({changeView}) {
+function Productos({ changeView }) {
 
   const [productos, setProductos] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productoActivo, setProductoActivo] = useState({});
   const [filtro, setFiltro] = useState('');
+  const [variantes, setVariantes] = useState([]);
+  const [tallaSeleccionada, setTallaSeleccionada] = useState('');
+  const [cantidadAComprar, setCantidadAComprar] = useState(1);
+  const [stockDisponible, setStockDisponible] = useState(0);
 
   useEffect(() => {
     fetchProductos();
@@ -51,6 +55,14 @@ function Productos({changeView}) {
   // Función para mostrar los detalles del producto
   const handleShowDetails = (producto) => {
     setProductoActivo(producto);
+    axios.get(`http://localhost:5000/api/obtenerVariantesPorProductoId/${producto.Id}`)
+      .then(response => {
+        setVariantes(response.data.length > 0 ? response.data : 'sin stock');
+      })
+      .catch(err => {
+        console.error("Error al cargar las variantes:", err);
+        setVariantes('sin stock');
+      });
     setModalShow(true);
   };
 
@@ -91,90 +103,127 @@ function Productos({changeView}) {
         onHide={() => setModalShow(false)}
         producto={productoActivo}
         changeView={changeView}
+        variantes={variantes}
+        tallaSeleccionada={tallaSeleccionada}
+        setTallaSeleccionada={setTallaSeleccionada}
+        stockDisponible={stockDisponible}
+        setStockDisponible={setStockDisponible}
+        cantidadAComprar={cantidadAComprar}
+        setCantidadAComprar={setCantidadAComprar}
       />
     </>
   );
 }
+const [cantidad, setCantidad] = useState(1);
+const navigateToCart = () => {
+  onHide();
+  changeView('ShoppingCart'); // Cambia la vista usando changeView
+};
 
-const ProductoModal = ({ show, onHide, producto, changeView }) => {
-  const [cantidad, setCantidad] = useState(1);
-  const navigateToCart = () => {
+
+useEffect(() => {
+  const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
+  const productoEnCarrito = carrito.find(item => item.Id === producto.Id);
+  setCantidad(productoEnCarrito ? productoEnCarrito.cantidad : 1);
+}, [show, producto.Id]);
+
+
+
+const actualizarCarrito = (delta) => {
+  const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
+  const index = carrito.findIndex((item) => item.Id === producto.Id);
+  let nuevaCantidad = cantidad + delta;
+
+  if (index !== -1) {
+    if (nuevaCantidad > 0) {
+      carrito[index].cantidad = nuevaCantidad;
+    } else {
+      carrito.splice(index, 1);
+    }
+  } else if (nuevaCantidad > 0) {
+    carrito.push({ ...producto, cantidad: nuevaCantidad });
+  }
+
+  localStorage.setItem('cartItems', JSON.stringify(carrito));
+  setCantidad(nuevaCantidad > 0 ? nuevaCantidad : 1);
+};
+
+const incrementarCantidadAComprar = () => {
+  if (cantidadAComprar < stockDisponible) {
+    setCantidadAComprar(cantidadAComprar + 1);
+  }
+};
+const decrementarCantidadAComprar = () => {
+  if (cantidadAComprar > 1) {
+    setCantidadAComprar(cantidadAComprar - 1);
+  }
+};
+
+const agregarAlCarrito = () => {
+  if (producto && tallaSeleccionada) {
+    onAddToCart({ ...producto, cantidad, talla: tallaSeleccionada });
     onHide();
-    changeView('ShoppingCart'); // Cambia la vista usando changeView
-  };
+  } else {
+    alert('Por favor, selecciona una talla.');
+  }
+};
+const handleTallaChange = (talla) => {
+  setTallaSeleccionada(talla);
+  const variante = variantes.find(v => v.Talla === talla);
+  setStockDisponible(variante ? variante.Cantidad : 0);
+  setCantidadAComprar(1); // Reiniciar la cantidad a comprar al cambiar de talla
+};
 
 
-  useEffect(() => {
-    const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
-    const productoEnCarrito = carrito.find(item => item.Id === producto.Id);
-    setCantidad(productoEnCarrito ? productoEnCarrito.cantidad : 1);
-  }, [show, producto.Id]);
+return (
+  <Modal show={show} onHide={onHide} size="md" aria-labelledby="contained-modal-title-vcenter" centered>
+    <Modal.Header closeButton>
+      <Modal.Title id="contained-modal-title-vcenter">
+        {producto?.Nombre || 'Cargando...'}
+      </Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      {producto && (
+        <>
+          <Image src={getImageUrl(producto.Imagen)} alt={`Imagen de ${producto.Nombre}`} className="modal-image" fluid />
+          <p>Precio: ${producto.Precio?.toLocaleString() || 'No disponible'}</p>
+          <div>
+            <label htmlFor="tallaSelect">Talla:</label>
+            <select
+              className="form-control"
+              id="tallaSelect"
+              value={tallaSeleccionada}
+              onChange={(e) => handleTallaChange(e.target.value)}
+              required
+            >
+              <option value="" disabled>Seleccione una talla</option>
+              {variantes.map((variante, index) => (
+                <option key={index} value={variante.Talla}>
+                  {variante.Talla}
+                </option>
+              ))}
+            </select>
+            <p>Cantidad disponible: {stockDisponible}</p>
+          </div>
+          <div className="d-flex align-items-center justify-content-center">
+            <Button onClick={decrementarCantidadAComprar} disabled={cantidadAComprar <= 1}>-</Button>
+            <span className="mx-2">{cantidadAComprar}</span>
+            <Button onClick={incrementarCantidadAComprar} disabled={cantidadAComprar >= stockDisponible}>+</Button>
+          </div>
+        </>
+      )}
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="primary" onClick={agregarAlCarrito}>
+        Agregar al Carrito
+      </Button>
+      <Button variant="secondary" onClick={navigateToCart}>
+        Ir al Carro
+      </Button>
+    </Modal.Footer>
+  </Modal>
+);
 
-
-
-  const actualizarCarrito = (delta) => {
-    const carrito = JSON.parse(localStorage.getItem('cartItems')) || [];
-    const index = carrito.findIndex((item) => item.Id === producto.Id);
-    let nuevaCantidad = cantidad + delta;
-
-    if (index !== -1) {
-      if (nuevaCantidad > 0) {
-        carrito[index].cantidad = nuevaCantidad;
-      } else {
-        carrito.splice(index, 1);
-      }
-    } else if (nuevaCantidad > 0) {
-      carrito.push({ ...producto, cantidad: nuevaCantidad });
-    }
-
-    localStorage.setItem('cartItems', JSON.stringify(carrito));
-    setCantidad(nuevaCantidad > 0 ? nuevaCantidad : 1);
-  };
-
-  const incrementarCantidad = () => {
-    actualizarCarrito(1);
-  };
-
-  const decrementarCantidad = () => {
-    if (cantidad > 1) {
-      actualizarCarrito(-1);
-    }
-  };
-
-  const agregarAlCarrito = () => {
-    if (producto) {
-      onAddToCart({ ...producto, cantidad });
-      onHide();
-    }
-  };
-
-  return (
-    <Modal show={show} onHide={onHide} size="md" aria-labelledby="contained-modal-title-vcenter" centered>
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          {producto?.Nombre || 'Cargando...'}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {producto && (
-          <>
-            <Image src={getImageUrl(producto.Imagen)} alt={`Imagen de ${producto.Nombre}`} className="modal-image" fluid />
-            <p>Precio: ${producto.Precio?.toLocaleString() || 'No disponible'}</p>
-            <div className="d-flex align-items-center justify-content-center">
-              <Button onClick={decrementarCantidad} disabled={cantidad <= 1}>-</Button>
-              <span className="mx-2">{cantidad}</span>
-              <Button onClick={incrementarCantidad} disabled={cantidad >= 20}>+</Button>
-            </div>
-          </>
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="primary" onClick={navigateToCart}>
-          Ir al Carro
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
 };
 
 export default Productos;

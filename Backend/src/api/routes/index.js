@@ -49,6 +49,8 @@ router.get('/productosvariantes', productosVariantesController.obtenerVariantes)
 router.get('/obtenerVariantesPorProductoId/:productoId', productosVariantesController.obtenerVariantesPorProductoId);
 router.post('/productosvariantes', productosVariantesController.crearVariante); 
 router.put('/actualizarVariante', productosVariantesController.actualizarVariante);
+router.put('/actualizarVarianteId/:producto_id', productosVariantesController.actualizarVarianteId);
+
 
 // Rutas para ProveedoresProductos
 router.get('/proveedoresproductos', proveedoresProductosController.obtenerProveedoresProductos);
