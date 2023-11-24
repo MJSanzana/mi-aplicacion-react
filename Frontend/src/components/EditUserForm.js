@@ -49,6 +49,11 @@ function EditUserForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (usuario && usuario.userId) {
+
+            if (!userData.NombreUsuario || !userData.Apellido || !userData.Email) {
+                alert('Los campos Nombre de Usuario, Apellido y Correo Electrónico son obligatorios.');
+                return;
+            }
             // Crea un objeto solo con los datos que quieres actualizar
             const dataToUpdate = {
                 NombreUsuario: userData.NombreUsuario,
@@ -105,7 +110,7 @@ function EditUserForm() {
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit} className="card card-body bg-light">
                 <div className="mb-3">
-                    <label htmlFor="NombreUsuario" className="form-label">Nombre de Usuario</label>
+                     <label htmlFor="NombreUsuario" className="form-label obligatorio-label">Nombre de Usuario*</label>
                     <input
                         type="text"
                         className="form-control"
