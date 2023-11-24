@@ -12,16 +12,16 @@ function EditUserForm() {
         NombreUsuario: '',
         Apellido: '',
         Email: '',
-        Contraseña: '',
         Documento_Numero: '',
         Celular_Numero: '',
         Direccion: '',
-        Comuna: ''
+        Comuna: '',
     });
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [repeatNewPassword, setRepeatNewPassword] = useState('');
     const [error, setError] = useState(null);
+    const [inputValue, setInputValue] = useState("");
     const homePath = '/pagina-usuario';
 
     useEffect(() => {
@@ -49,32 +49,50 @@ function EditUserForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (usuario && usuario.userId) {
+            // Crea un objeto solo con los datos que quieres actualizar
+            const dataToUpdate = {
+                NombreUsuario: userData.NombreUsuario,
+                Apellido: userData.Apellido,
+                Email: userData.Email,
+                Documento_Numero: userData.Documento_Numero || null,
+                Celular_Numero: userData.Celular_Numero || null,
+                Direccion: userData.Direccion || null,
+                Comuna: userData.Comuna || null,
+            };
+
+
 
             // Actualiza la información del usuario
             try {
-                await axios.put(`http://localhost:5000/api/EditUsers/${usuario.userId}`, userData);
+                const response = await axios.put(`http://localhost:5000/api/EditUsers/${usuario.userId}`, dataToUpdate);
                 alert('Información actualizada exitosamente');
+                // Otras acciones en caso de éxito (actualizar estado, redireccionar, etc.)
             } catch (error) {
                 console.error('Error al actualizar la información:', error);
-                setError('Error al actualizar la información');
+                setError('Error al actualizar la información: ' + (error.response?.data?.message || error.message));
             }
 
-            // Cambia la contraseña si es necesario
-            if (newPassword && newPassword === repeatNewPassword) {
+            // Actualizar contraseña si es necesario y las contraseñas nuevas coinciden
+            if (newPassword && newPassword === repeatNewPassword && currentPassword) {
                 try {
                     await axios.put(`http://localhost:5000/api/cambiar-contrasena/${usuario.userId}`, {
-                        nuevaContraseña: newPassword
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
                     });
                     alert('Contraseña actualizada exitosamente');
+                    // Limpia los campos de contraseña después de la actualización exitosa
+                    setNewPassword('');
+                    setRepeatNewPassword('');
+                    setCurrentPassword('');
                 } catch (error) {
                     console.error('Error al cambiar la contraseña:', error);
-                    setError('Error al actualizar la contraseña');
+                    setError('Error al actualizar la contraseña: ' + (error.response?.data?.message || error.message));
                 }
             } else if (newPassword && newPassword !== repeatNewPassword) {
                 alert('Las contraseñas no coinciden.');
             }
-        };
-    }
+        }
+    };
 
     return (
         <div className="container mt-5">
@@ -93,7 +111,7 @@ function EditUserForm() {
                         className="form-control"
                         id="NombreUsuario"
                         name="NombreUsuario"
-                        value={userData.NombreUsuario}
+                        value={userData.NombreUsuario || ''}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -104,7 +122,7 @@ function EditUserForm() {
                         className="form-control"
                         id="Apellido"
                         name="Apellido"
-                        value={userData.Apellido}
+                        value={userData.Apellido || ''}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -115,7 +133,7 @@ function EditUserForm() {
                         className="form-control"
                         id="Email"
                         name="Email"
-                        value={userData.Email}
+                        value={userData.Email || ''}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -126,7 +144,7 @@ function EditUserForm() {
                         className="form-control"
                         id="Documento_Numero"
                         name="Documento_Numero"
-                        value={userData.Documento_Numero}
+                        value={userData.Documento_Numero || ''}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -137,7 +155,7 @@ function EditUserForm() {
                         className="form-control"
                         id="Celular_Numero"
                         name="Celular_Numero"
-                        value={userData.Celular_Numero}
+                        value={userData.Celular_Numero || ''}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -148,7 +166,7 @@ function EditUserForm() {
                         className="form-control"
                         id="Direccion"
                         name="Direccion"
-                        value={userData.Direccion}
+                        value={userData.Direccion || ''}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -158,7 +176,7 @@ function EditUserForm() {
                         className="form-control"
                         id="Comuna"
                         name="Comuna"
-                        value={userData.Comuna}
+                        value={userData.Comuna || ''}
                         onChange={handleInputChange}
                     >
                         <option value="">-- Selecciona una Comuna --</option>
