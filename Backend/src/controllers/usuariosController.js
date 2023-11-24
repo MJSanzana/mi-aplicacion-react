@@ -93,33 +93,27 @@ exports.loginUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const {
-    NombreUsuario, Apellido, Email, Contraseña,
+    NombreUsuario, Apellido, Email,
     Documento_Numero, Celular_Numero,
     Direccion, Comuna
   } = req.body;
 
-  if (!NombreUsuario || !Apellido || !Email || !Documento_Numero || !Celular_Numero || !Direccion || !Comuna) {
-    return res.status(400).json({ error: "Todos los campos son obligatorios." });
+  if (!NombreUsuario || !Apellido || !Email ) {
+    return res.status(400).json({ error: "Nombre de usuario, apellido y email son obligatorios." });
   }
 
   try {
-    let hashedPassword;
-    if (Contraseña) {
-      hashedPassword = await bcrypt.hash(Contraseña, 10);
-    } else {
-      //obtener la contraseña actual
-      const [currentUser] = await db.query('SELECT Contraseña FROM Usuarios WHERE Id = ?', [req.params.id]);
-      hashedPassword = currentUser.Contraseña;
-    }
-
-    await db.query('UPDATE Usuarios SET NombreUsuario = ?, Apellido = ?, Email = ?, Contraseña = ?, Documento_Numero = ?, Celular_Numero = ?, Direccion = ?, Comuna = ? WHERE Id = ?',
-      [NombreUsuario, Apellido, Email, hashedPassword,Documento_Numero, Celular_Numero, Direccion, Comuna, req.params.id]);
+    await db.query(
+      'UPDATE Usuarios SET NombreUsuario = ?, Apellido = ?, Email = ?, Documento_Numero = IFNULL(?, Documento_Numero), Celular_Numero = IFNULL(?, Celular_Numero), Direccion = IFNULL(?, Direccion), Comuna = IFNULL(?, Comuna) WHERE Id = ?',
+      [NombreUsuario, Apellido, Email, Documento_Numero, Celular_Numero, Direccion, Comuna, req.params.id]
+    );
 
     res.json({ message: 'Usuario actualizado con éxito' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 exports.deactivateUser = async (req, res) => {
   const userId = req.params.id;
