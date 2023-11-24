@@ -55,10 +55,10 @@ function Productos({ changeView }) {
 
   // Esta función ahora maneja tanto agregar al carrito como mostrar detalles
   const agregarYMostrarDetalles = (producto) => {
-    const carritoActualizado = actualizarCarrito(producto);
-    localStorage.setItem('cartItems', JSON.stringify(carritoActualizado));
+    setProductoActivo(producto);
     handleShowDetails(producto);
   };
+  
 
   // Función para actualizar el carrito
   const actualizarCarrito = (producto) => {
