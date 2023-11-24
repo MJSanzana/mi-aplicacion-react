@@ -45,15 +45,15 @@ function ShoppingCart() {
         );
         saveCartToLocalStorage(newItems);
     };
-    
+
     const decreaseQuantity = (Nombre) => {
         const newItems = items.map(item =>
             item.Nombre === Nombre ? { ...item, cantidad: Math.max(1, item.cantidad - 1) } : item
         );
         saveCartToLocalStorage(newItems);
     };
-    
-    
+
+
 
     const removeItem = (Nombre) => {
         const newItems = items.filter(item => item.Nombre !== Nombre);
@@ -69,10 +69,10 @@ function ShoppingCart() {
                     <h2>Carro ({items.length} productos)</h2>
                     <ListGroup>
                         {items.map(item => (
-                            <ListGroupItem key={item.Nombre}>
+                            <ListGroupItem key={`${item.Nombre}-${item.talla}`}> {/* Usar una combinación de nombre y talla para la key */}
                                 <Row>
                                     <Col md="6">
-                                        <strong>{item.Nombre}</strong>
+                                        <strong>{item.Nombre}</strong> - <em>Talla: {item.talla}</em> {/* Mostrar la talla aquí */}
                                     </Col>
                                     <Col md="2">
                                         {formatPrice(item.Precio)}
@@ -100,15 +100,15 @@ function ShoppingCart() {
                             </Row>
                         </ListGroupItem>
                     </ListGroup>
-                    </Col>
-                    <div className="input-field col-3 offset-8 mb-2">
+                </Col>
+                <div className="input-field col-3 offset-8 mb-2">
                     <Button color="danger" block onClick={clearCart}>Vaciar Carrito</Button>
-                    </div>
-                    <div className="input-field col-3 offset-8 mb-2">
+                </div>
+                <div className="input-field col-3 offset-8 mb-2">
                     <Button color="primary" block>Pagar</Button>
-                    </div>
-                    
-                
+                </div>
+
+
             </Row>
         </Container>
     );
