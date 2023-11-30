@@ -10,6 +10,7 @@ import Login from './Login';
 import Registro from './Registro';
 import Nosotros from '../pages/Nosotros';
 import Soporte from '../pages/Soporte';
+import DetallesProducto from '../pages/DetallesProducto';
 //import EditUserForm from './EditUserForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserEdit, faSignOutAlt  } from '@fortawesome/free-solid-svg-icons';
@@ -19,6 +20,7 @@ function UserPage() {
     const [currentView, setCurrentView] = useState('Home');
     const navigate = useNavigate();
     const { usuario, setUsuario  } = useContext(AuthContext);
+    const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
     // Supongamos que este estado representa si el usuario está logueado
     const isUserLoggedIn = usuario && usuario.userId;
@@ -142,6 +144,8 @@ function UserPage() {
             {currentView === 'Registro' && <Registro changeView={changeView} />}
             {currentView === 'Nosotros' && <Nosotros />}
             {currentView === 'Soporte' && <Soporte />}
+            {currentView === 'DetallesProducto' && <DetallesProducto productoId={productoSeleccionado} />}
+        
         </div>
     );
 }

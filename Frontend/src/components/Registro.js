@@ -1,7 +1,7 @@
 // Registro.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import Footer from '../pages/Footer';
+import Footer from './Footer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Button} from 'react-bootstrap';
 

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Modal, FormControl, InputGroup, Image } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 // Otras importaciones aquí...
 const getImageUrl = (imageName) => {
   return `http://localhost:5000/${imageName}`;
+
 };
 
-function Productos({ changeView }) {
+function Productos({ changeView, setProductoSeleccionado }) {
 
   const [productos, setProductos] = useState([]);
   const [modalShow, setModalShow] = useState(false);
@@ -16,6 +18,11 @@ function Productos({ changeView }) {
   const [tallaSeleccionada, setTallaSeleccionada] = useState('');
   const [cantidadAComprar, setCantidadAComprar] = useState(1);
   const [stockDisponible, setStockDisponible] = useState(0);
+
+  const mostrarDetallesProducto = (idProducto) => {
+    setProductoSeleccionado(idProducto);
+    changeView('DetallesProducto');
+  };
 
   // Función para manejar agregar productos al carrito
   const onAddToCart = (productToAdd) => {
@@ -58,7 +65,7 @@ function Productos({ changeView }) {
     setProductoActivo(producto);
     handleShowDetails(producto);
   };
-  
+
 
   // Función para actualizar el carrito
   const actualizarCarrito = (producto) => {
@@ -105,12 +112,15 @@ function Productos({ changeView }) {
         <div className="row">
           {productosFiltrados.map((producto) => (
             <div key={producto.Id} className="col-md-3 mb-3">
-              <Card>
+              <Card onClick={() => changeView('DetallesProducto', producto.Id)}>
                 <Card.Img variant="top" src={getImageUrl(producto.Imagen)} className="img-cuadrada" alt={`Imagen de ${producto.Nombre}`} />
                 <Card.Body>
                   <Card.Title>{producto.Nombre}</Card.Title>
                   <Card.Text>Precio: ${producto.Precio.toLocaleString()}</Card.Text>
-                  <Button variant="primary" onClick={() => agregarYMostrarDetalles(producto)}>
+                  <Button variant="primary" onClick={(e) => {
+                    e.stopPropagation();
+                    agregarYMostrarDetalles(producto);
+                  }}>
                     Agregar al Carrito
                   </Button>
                 </Card.Body>
@@ -189,7 +199,7 @@ const ProductoModal = ({
     if (producto && tallaSeleccionada && cantidadAComprar > 0) {
       // Aquí usas la función onAddToCart pasada como prop
       onAddToCart({ ...producto, cantidad: cantidadAComprar, talla: tallaSeleccionada });
-      onHide(); 
+      onHide();
     } else {
       alert('Por favor, selecciona una talla y asegúrate de que la cantidad sea mayor que 0.');
     }

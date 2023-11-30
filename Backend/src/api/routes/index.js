@@ -38,6 +38,7 @@ router.get('/colegios/:colegioId/usuarios', colegiosUsuariosController.obtenerUs
 // Rutas para Productos
 router.get('/ObtenerProductos', productosController.obtenerProductos);
 router.get('/ObtenerProductos/:userId', productosController.obtenerProductosPorProveedor);
+router.get('/ObtenerProductoPorId/:id', productosController.obtenerProductoPorId);
 router.post('/CreateProducts', productosController.crearProducto);
 router.put('/aprobado/:id', productosController.updateProductApproval);
 router.get('/productos/pendientes', productosController.getProductosPendientes);
@@ -80,7 +81,8 @@ router.get('/usuarios/:usuario_id/pedidos', pedidosController.obtenerPedidosUsua
 router.post('/detallepedidos', detallePedidosController.agregarDetallePedido);
 
 // Rutas para Opiniones y Valoraciones
-router.post('/opinionesvaloraciones', opinionesValoracionesController.crearOpinionValoracion);
+router.post('/crearOpinionValoracion', opinionesValoracionesController.crearOpinionValoracion);
+router.get('/reseñas/:productoId', opinionesValoracionesController.obtenerReseñasPorProductoId);
 
 // Rutas para Envíos
 router.post('/envios', enviosController.crearEnvio);

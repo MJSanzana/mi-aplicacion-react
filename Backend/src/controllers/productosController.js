@@ -194,3 +194,25 @@ exports.rechazarProducto = async (req, res) => {
         });
     });
 };
+
+// Función para obtener un producto por su ID
+exports.obtenerProductoPorId = async (req, res) => {
+    const productoId = req.params.id;
+
+    try {
+        // Realizar una consulta a la base de datos para obtener el producto
+        const sqlQuery = 'SELECT * FROM Productos WHERE id = ?';
+        const producto = await db.query(sqlQuery, [productoId]);
+
+        // Si no se encuentra el producto, enviar una respuesta de no encontrado
+        if (producto.length === 0) {
+            return res.status(404).json({ message: 'Producto no encontrado.' });
+        }
+
+        // Enviar la información del producto en la respuesta
+        res.json(producto[0]);
+    } catch (error) {
+        console.error('Error al obtener el producto:', error);
+        res.status(500).json({ error: 'Error interno del servidor al obtener el producto.' });
+    }
+};
