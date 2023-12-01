@@ -82,7 +82,7 @@ router.post('/detallepedidos', detallePedidosController.agregarDetallePedido);
 
 // Rutas para Opiniones y Valoraciones
 router.post('/crearOpinionValoracion', opinionesValoracionesController.crearOpinionValoracion);
-router.get('/reseñas/:productoId', opinionesValoracionesController.obtenerReseñasPorProductoId);
+router.get('/ResenasComentarios/:productoId', opinionesValoracionesController.obtenerReseñasPorProductoId);
 
 // Rutas para Envíos
 router.post('/envios', enviosController.crearEnvio);

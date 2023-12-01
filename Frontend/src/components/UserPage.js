@@ -1,3 +1,4 @@
+//UserPage.js
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Nav, NavItem, NavLink } from 'reactstrap';
@@ -13,13 +14,13 @@ import Soporte from '../pages/Soporte';
 import DetallesProducto from '../pages/DetallesProducto';
 //import EditUserForm from './EditUserForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserEdit, faSignOutAlt  } from '@fortawesome/free-solid-svg-icons';
+import { faUserEdit, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function UserPage() {
     const [currentView, setCurrentView] = useState('Home');
     const navigate = useNavigate();
-    const { usuario, setUsuario  } = useContext(AuthContext);
+    const { usuario, setUsuario } = useContext(AuthContext);
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
     // Supongamos que este estado representa si el usuario está logueado
@@ -49,6 +50,7 @@ function UserPage() {
         // Redirige al usuario a la página de inicio de sesión o a donde desees
         navigate('/pagina-usuario'); // Ajusta la ruta según tus necesidades
     };
+    console.log("Producto seleccionado en UserPage:", productoSeleccionado);
 
 
 
@@ -137,15 +139,16 @@ function UserPage() {
 
             {/* Renderizado condicional de componentes */}
             {currentView === 'Home' && <Home changeView={changeView} />}
-            {currentView === 'Productos' && <Productos changeView={changeView} />}
+            {currentView === 'Productos' && <Productos changeView={changeView} setProductoSeleccionado={setProductoSeleccionado} />}
             {currentView === 'Colegios' && <Colegios />}
             {currentView === 'ShoppingCart' && <ShoppingCart />}
             {currentView === 'Login' && <Login changeView={changeView} navigate={navigate} />}
             {currentView === 'Registro' && <Registro changeView={changeView} />}
             {currentView === 'Nosotros' && <Nosotros />}
             {currentView === 'Soporte' && <Soporte />}
-            {currentView === 'DetallesProducto' && <DetallesProducto productoId={productoSeleccionado} />}
-        
+            {currentView === 'DetallesProducto' && productoSeleccionado && (
+                <DetallesProducto productoId={productoSeleccionado} />
+            )}
         </div>
     );
 }

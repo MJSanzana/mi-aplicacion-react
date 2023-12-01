@@ -20,9 +20,11 @@ function Productos({ changeView, setProductoSeleccionado }) {
   const [stockDisponible, setStockDisponible] = useState(0);
 
   const mostrarDetallesProducto = (idProducto) => {
+    console.log("Seleccionado producto ID:", idProducto); // Esto debería mostrar el ID correcto del producto clickeado
     setProductoSeleccionado(idProducto);
     changeView('DetallesProducto');
   };
+
 
   // Función para manejar agregar productos al carrito
   const onAddToCart = (productToAdd) => {
@@ -59,11 +61,18 @@ function Productos({ changeView, setProductoSeleccionado }) {
         console.error("Error al cargar los productos:", err);
       });
   };
+  // Cuando se hace clic en la imagen del producto, cambia a la vista de detalles del producto
+  const navegarADetallesProducto = (productoId) => {
+    console.log("Navegando a DetallesProducto con ID:", productoId);
+    setProductoSeleccionado(productoId); // Establece el ID del producto seleccionado
+    changeView('DetallesProducto'); // Cambia la vista a DetallesProducto
+  };
 
-  // Esta función ahora maneja tanto agregar al carrito como mostrar detalles
-  const agregarYMostrarDetalles = (producto) => {
-    setProductoActivo(producto);
-    handleShowDetails(producto);
+  // Cuando se hace clic en el botón, muestra los detalles en el modal
+  const mostrarDetallesEnModal = (producto) => {
+    console.log("Mostrando detalles en modal para el producto ID:", producto.Id);
+    setProductoActivo(producto); // Establece el producto activo para el modal
+    handleShowDetails(producto); // Muestra el modal con los detalles
   };
 
 
@@ -112,15 +121,23 @@ function Productos({ changeView, setProductoSeleccionado }) {
         <div className="row">
           {productosFiltrados.map((producto) => (
             <div key={producto.Id} className="col-md-3 mb-3">
-              <Card onClick={() => changeView('DetallesProducto', producto.Id)}>
-                <Card.Img variant="top" src={getImageUrl(producto.Imagen)} className="img-cuadrada" alt={`Imagen de ${producto.Nombre}`} />
+              <Card>
+                <Card.Img
+                  variant="top"
+                  src={getImageUrl(producto.Imagen)}
+                  className="img-cuadrada"
+                  alt={`Imagen de ${producto.Nombre}`}
+                  onClick={() => navegarADetallesProducto(producto.Id)} // Se llama al hacer clic en la imagen
+                />
                 <Card.Body>
                   <Card.Title>{producto.Nombre}</Card.Title>
                   <Card.Text>Precio: ${producto.Precio.toLocaleString()}</Card.Text>
-                  <Button variant="primary" onClick={(e) => {
-                    e.stopPropagation();
-                    agregarYMostrarDetalles(producto);
-                  }}>
+                  <Button
+                    variant="primary"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Previene que el evento clic en la imagen se dispare también
+                      mostrarDetallesEnModal(producto); // Se llama al hacer clic en el botón
+                    }}>
                     Agregar al Carrito
                   </Button>
                 </Card.Body>
