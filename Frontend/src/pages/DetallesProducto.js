@@ -21,12 +21,29 @@ const DetallesProducto = ({ productoId }) => {
   const handleAddToCart = () => {
     if (producto && tallaSeleccionada && cantidadAComprar > 0) {
       const productoParaCarrito = {
-        ...producto,
+        Id: producto.Id,
+        Nombre: producto.Nombre,
+        Imagen: producto.Imagen,
+        Precio: producto.Precio,
         cantidad: cantidadAComprar,
-        talla: tallaSeleccionada
+        talla: tallaSeleccionada,
+        productoVarianteId: variantes.find(v => v.Talla === tallaSeleccionada)?.Id
       };
-      console.log('Producto añadido al carrito', productoParaCarrito);
-      // Aquí agregarías el producto al carrito
+
+      // Aquí se maneja la lógica para agregar el producto al carrito
+      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      const existingItemIndex = cartItems.findIndex(item => item.Id === productoParaCarrito.Id && item.talla === productoParaCarrito.talla);
+
+      if (existingItemIndex > -1) {
+        // Producto ya existe en el carrito, actualiza la cantidad
+        cartItems[existingItemIndex].cantidad += productoParaCarrito.cantidad;
+      } else {
+        // Producto no existe en el carrito, agrega nuevo
+        cartItems.push(productoParaCarrito);
+      }
+
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      alert('Producto añadido al carrito');
     } else {
       alert('Por favor, selecciona una talla y asegúrate de que la cantidad sea mayor que 0.');
     }
@@ -37,7 +54,7 @@ const DetallesProducto = ({ productoId }) => {
       console.error('No se proporcionó ID de producto');
       return;
     }
-  
+
     const fetchData = async () => {
       try {
         const resProducto = await axios.get(`http://localhost:5000/api/ObtenerProductoPorId/${productoId}`);
@@ -47,17 +64,17 @@ const DetallesProducto = ({ productoId }) => {
             imageUrl: getImageUrl(resProducto.data.Imagen)
           });
         }
-  
+
         const resReseñas = await axios.get(`http://localhost:5000/api/resenas/${productoId}`);
         setReseñas(resReseñas.data);
       } catch (error) {
         console.error('Error al cargar el producto o las reseñas:', error);
       }
     };
-  
+
     fetchData();
   }, [productoId]);
-  
+
   useEffect(() => {
     const fetchVariantes = async () => {
       try {
@@ -71,12 +88,12 @@ const DetallesProducto = ({ productoId }) => {
         console.error('Error al cargar las variantes del producto:', error);
       }
     };
-  
+
     if (productoId) {
       fetchVariantes();
     }
   }, [productoId]);
-  
+
 
   // Funciones adicionales para manejar la interacción del usuario
   const manejarValoracion = (valor) => {
@@ -141,15 +158,25 @@ const DetallesProducto = ({ productoId }) => {
 
   return (
     <div className="container mt-5">
-      <div className="row">
-        <div className="col-md-6">
-          <Card>
-            <Card.Img variant="top" src={producto.imageUrl} alt={`Imagen de ${producto.Nombre}`} />
-          </Card>
-        </div>
+    <div className="row">
+      <div className="col-md-6 position-relative">
+        {/* Asumiendo que tienes un estado o propiedad para SKU */}
+        <span className="badge bg-secondary">
+              SKU: {producto.SKU}
+            </span>
+        <Card>
+          <Card.Img
+            variant="top"
+            src={producto.imageUrl}
+            alt={`Imagen de ${producto.Nombre}`}
+            style={{ maxHeight: '300px', width: 'auto', margin: '0 auto' }} // Estilos en línea para la imagen
+          />
+        </Card>
+      </div>
         <div className="col-md-6">
           <h2>{producto.Nombre}</h2>
-          <p>{producto.Descripción}</p>
+          <p>{producto.Descripcion}</p>
+          <p>Género: {producto.Genero}</p> 
           <h3>${producto.Precio}</h3>
           <div>
             <label htmlFor="tallaSelect">Talla:</label>
@@ -165,24 +192,26 @@ const DetallesProducto = ({ productoId }) => {
               ))}
             </select>
           </div>
-          <p>Cantidad disponible: {stockDisponible}</p>
+          <p>Stock disponible: {stockDisponible}</p>
           <div className="d-flex align-items-center justify-content-center">
-            <Button onClick={decrementarCantidadAComprar} disabled={cantidadAComprar <= 1}>-</Button>
+            <Button variant="secondary" onClick={decrementarCantidadAComprar} disabled={cantidadAComprar <= 1}>-</Button>
             <span className="mx-2">{cantidadAComprar}</span>
-            <Button onClick={incrementarCantidadAComprar} disabled={cantidadAComprar >= stockDisponible}>+</Button>
+            <Button variant="secondary" onClick={incrementarCantidadAComprar} disabled={cantidadAComprar >= stockDisponible}>+</Button>
           </div>
-          <Button variant="primary" onClick={handleAddToCart}>Añadir al Carrito</Button>
+          <Button variant="primary" onClick={handleAddToCart} className="mt-3">Añadir al Carrito</Button>
         </div>
       </div>
 
-      {/* Sección de reseñas */}
-
-      <h2 className="mb-3">Reseñas</h2>
-      {reseñas.map(reseña => (
-        <div key={reseña.id} className="mb-2">
-
-        </div>
-      ))}
+      <h2 className="mb-3 mt-5">Reseñas</h2>
+      {reseñas.length > 0 ? (
+        reseñas.map(reseña => (
+          <div key={reseña.id} className="mb-2">
+            {/* Aquí se mostrarían los detalles de las reseñas */}
+          </div>
+        ))
+      ) : (
+        <p>No hay reseñas aún para este producto.</p>
+      )}
 
       <Card className="mt-4 mb-4">
         <Card.Body>
@@ -202,7 +231,6 @@ const DetallesProducto = ({ productoId }) => {
                 ))}
               </div>
             </div>
-            {/* Resto de tu formulario */}
             <Form.Group className="mb-3">
               <Form.Label>Comentario</Form.Label>
               <Form.Control
@@ -218,7 +246,6 @@ const DetallesProducto = ({ productoId }) => {
       </Card>
     </div>
   );
-
-};
+}
 
 export default DetallesProducto;

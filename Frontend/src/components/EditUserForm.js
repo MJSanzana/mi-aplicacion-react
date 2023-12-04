@@ -110,7 +110,7 @@ function EditUserForm() {
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit} className="card card-body bg-light">
                 <div className="mb-3">
-                     <label htmlFor="NombreUsuario" className="form-label obligatorio-label">Nombre de Usuario*</label>
+                     <label htmlFor="NombreUsuario" className="form-label obligatorio-label">Nombre de Usuario *</label>
                     <input
                         type="text"
                         className="form-control"
@@ -121,7 +121,7 @@ function EditUserForm() {
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="Apellido" className="form-label">Apellido</label>
+                    <label htmlFor="Apellido" className="form-label">Apellido *</label>
                     <input
                         type="text"
                         className="form-control"
@@ -132,7 +132,7 @@ function EditUserForm() {
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="Email" className="form-label">Correo electrónico</label>
+                    <label htmlFor="Email" className="form-label">Correo electrónico *</label>
                     <input
                         type="text"
                         className="form-control"
@@ -143,7 +143,7 @@ function EditUserForm() {
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="Apellido" className="form-label">RÚN</label>
+                    <label htmlFor="Documento_Numero" className="form-label">RUN</label>
                     <input
                         type="text"
                         className="form-control"
@@ -154,7 +154,7 @@ function EditUserForm() {
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="Apellido" className="form-label">Teléfono Celular</label>
+                    <label htmlFor="Celular_Numero" className="form-label">Teléfono Celular</label>
                     <input
                         type="text"
                         className="form-control"
@@ -165,7 +165,7 @@ function EditUserForm() {
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="Apellido" className="form-label">Direccion</label>
+                    <label htmlFor="Direccion" className="form-label">Dirección</label>
                     <input
                         type="text"
                         className="form-control"

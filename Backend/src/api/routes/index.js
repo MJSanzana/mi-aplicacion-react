@@ -18,7 +18,8 @@ const pagosController = require('../../controllers/pagosController');
 const configuracionPagoController = require('../../controllers/configuracionPagoController');
 const logPagosController = require('../../controllers/logPagosController');
 const verificarAutenticacion = require('../../middlewares/verificarAutenticacion');
-const mensajesController = require('../../controllers/mensajesController')
+const mensajesController = require('../../controllers/mensajesController');
+const carritoController = require ('../../controllers/carritoController');
 
 //Obtener todos los colegios
 router.get('/getAllColegios', colegioController.getAllColegios);
@@ -53,10 +54,13 @@ router.put('/actualizarVariante', productosVariantesController.actualizarVariant
 router.put('/actualizarVarianteId/:producto_id', productosVariantesController.actualizarVarianteId);
 
 
+
 // Rutas para ProveedoresProductos
 router.get('/proveedoresproductos', proveedoresProductosController.obtenerProveedoresProductos);
 router.post('/proveedoresproductos', proveedoresProductosController.crearProveedorProducto);
 router.get('/proveedoresproductos/:userId', proveedoresProductosController.obtenerProductosPorProveedorId);
+router.post('/proveedoresproductos/registrarVenta', proveedoresProductosController.registrarVentaAProveedor);
+router.post('/proveedoresproductos/actualizarStockYNotificar', proveedoresProductosController.actualizarStockYNotificar);
 
 
 // Rutas para crear ticket soporte
@@ -74,7 +78,7 @@ router.post('/reactivate/:id', usuariosController.reactivateUser);
 router.put('/cambiar-contrasena/:id', usuariosController.changeUserPassword);
 
 // Rutas para Pedidos
-router.post('/pedidos', pedidosController.crearPedido);
+router.post('/pedidos', verificarAutenticacion,pedidosController.crearPedido);
 router.get('/usuarios/:usuario_id/pedidos', pedidosController.obtenerPedidosUsuario);
 
 // Rutas para Detalle de Pedidos
@@ -95,6 +99,7 @@ router.get('/metodospago', metodosPagoController.obtenerMetodosPago);
 // Rutas para Pagos
 router.post('/pagos', pagosController.registrarPago);
 router.get('/pagos', verificarAutenticacion, pagosController.obtenerPagos);
+router.post('/crearPagoSimulado', verificarAutenticacion,pagosController.crearPagoSimulado);
 
 // Rutas para Configuración de Pagos
 router.post('/configuracionpago', configuracionPagoController.configurarProveedorPago);
@@ -110,5 +115,10 @@ router.get('/mensajes/usuario/:UsuarioId', mensajesController.obtenerMensajes);
 router.put('/mensajes/marcar-leido/:mensajeId', mensajesController.marcarMensajeLeido);
 router.post('/mensajes/crear', mensajesController.crearMensaje);
 router.get('/mensajes/enviados/:emisorId', mensajesController.obtenerMensajesEnviados);
+
+//Rutas de carrito
+router.get('/carrito', verificarAutenticacion, carritoController.getCart);
+router.post('/carrito/agregar', verificarAutenticacion, carritoController.addItemToCart);
+router.delete('/carrito/eliminar/:itemId', verificarAutenticacion, carritoController.removeItemFromCart);
 
 module.exports = router;

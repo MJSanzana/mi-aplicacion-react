@@ -1,63 +1,43 @@
-// Importaciones
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const db = require('../api/routes/db/db');
-const jwt = require('jsonwebtoken'); 
-
+const session = require('express-session');
+const jwt = require('jsonwebtoken');
 const verificarAutenticacion = require('../middlewares/verificarAutenticacion');
+const verificarSesion = require('../middlewares/verificarSesion');
 
-
-// Configuración de la app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Si estás detrás de un proxy (como Nginx o Heroku), confía en él:
-app.set('trust proxy', 1);
-app.use(express.urlencoded({ extended: true }));
-
-// Servir archivos estáticos desde el directorio 'uploads'
-app.use('/uploads', express.static('uploads'));
-
-app.use(express.static('public'));
-
-// Configuración de CORS
 app.use(cors({
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    // ... otras opciones de CORS si las necesitas
+    origin: 'http://localhost:3000', // Aquí especificas el origen que deseas permitir
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Incluye 'OPTIONS' en los métodos permitidos
+    allowedHeaders: ['Content-Type', 'Authorization'], // Especifica los encabezados permitidos
 }));
 
-// Configuración de Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads'));
+app.use(express.static('public'));
 
-//app.use(express.static(path.join(__dirname, 'public')));
+// Configuración de sesiones
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
 
-// Función authenticateJWT
-function authenticateJWT(req, res, next) {
-    const authHeader = req.headers.authorization;
+// Middleware para autenticar token
+app.use(verificarAutenticacion);
 
-    if (authHeader) {
-        const token = authHeader.split(' ')[1];
+// Middleware para manejar sesiones
+app.use(verificarSesion);
 
-        jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
-            if (err) {
-                return res.sendStatus(403);
-            }
-
-            req.user = user;
-            next();
-        });
-    } else {
-        res.sendStatus(401);
-    }
-}
-
-// Añadido: Importa y usa las rutas del archivo 'index.js'
-const apiRoutes = require('../api/routes/index'); 
+// Rutas
+const apiRoutes = require('../api/routes/index');
 app.use('/api', apiRoutes);
 
-// Inicializar el servidor
 app.listen(PORT, () => {
-    console.log(`Servidor en el puerto ${PORT}`);
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
 });

@@ -44,6 +44,56 @@ exports.obtenerProductosPorProveedorId = async (req, res) => {
     }
 };
 
+exports.registrarVentaAProveedor = async (productoVarianteId, cantidadVendida) => {
+    try {
+        // Obtén el ID del proveedor asociado con la variante del producto
+        const [variante] = await db.query('SELECT Proveedor_Id FROM ProveedoresProductos WHERE ProductoVariante_Id = ?', [productoVarianteId]);
+        
+        if (!variante) {
+            throw new Error("Proveedor no encontrado para la variante del producto");
+        }
+
+        const proveedorId = variante.Proveedor_Id;
+
+        // Inserta un registro en una tabla de 'VentasAProveedores' o similar
+        await db.query('INSERT INTO VentasAProveedores (Proveedor_Id, ProductoVariante_Id, CantidadVendida) VALUES (?, ?, ?)', [proveedorId, productoVarianteId, cantidadVendida]);
+
+        // Opcional: Envía una notificación al proveedor (requiere integración con un sistema de notificaciones)
+        NotificarProveedor(proveedorId, productoVarianteId, cantidadVendida);
+
+        return { success: true, message: 'Venta registrada con éxito' };
+    } catch (error) {
+        console.error('Error al registrar venta al proveedor:', error);
+        return { success: false, message: error.message };
+    }
+};
+
+// Función ficticia para simular la notificación a un proveedor
+const NotificarProveedor = (proveedorId, productoVarianteId, cantidadVendida) => {
+    // Implementa tu propia lógica de notificación aquí
+    console.log(`Notificando al proveedor ${proveedorId} sobre la venta de la variante ${productoVarianteId} en cantidad ${cantidadVendida}`);
+};
+
+// proveedoresProductosController.js
+exports.actualizarStockYNotificar = async (productoVarianteId, cantidadVendida) => {
+    try {
+        // Actualizar stock
+        const [variante] = await db.query('SELECT Cantidad FROM ProductosVariantes WHERE Id = ?', [productoVarianteId]);
+        const nuevaCantidad = variante.Cantidad - cantidadVendida;
+        await db.query('UPDATE ProductosVariantes SET Cantidad = ? WHERE Id = ?', [nuevaCantidad, productoVarianteId]);
+
+        // Notificar al proveedor (simulación)
+        const [proveedor] = await db.query('SELECT Proveedor_Id FROM ProveedoresProductos WHERE ProductoVariante_Id = ?', [productoVarianteId]);
+        console.log(`Notificando al proveedor ${proveedor.Proveedor_Id} sobre la venta de ${cantidadVendida} unidades del producto ${productoVarianteId}`);
+
+        // Aquí podrías incluir lógica adicional, como enviar un email o realizar una llamada a una API externa
+
+        return { success: true, message: 'Stock actualizado y proveedor notificado' };
+    } catch (error) {
+        console.error('Error al actualizar stock y notificar al proveedor:', error);
+        return { success: false, message: error.message };
+    }
+};
 
 
 // Otros métodos para actualizar y eliminar asociaciones proveedor-producto

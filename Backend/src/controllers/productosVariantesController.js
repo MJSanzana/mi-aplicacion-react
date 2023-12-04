@@ -80,3 +80,20 @@ exports.actualizarVarianteId = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+//simular pago
+
+exports.actualizarVariante = async (req) => {
+    const { producto_id, cantidad } = req.body;
+
+    try {
+        // Actualiza la cantidad de stock
+        await db.query(
+            'UPDATE ProductosVariantes SET Cantidad = GREATEST(0, Cantidad + ?) WHERE Producto_Id = ?',
+            [cantidad, producto_id]
+        );
+    } catch (error) {
+        console.error('Error al actualizar la variante:', error);
+        throw error; // Lanza el error para que pueda ser manejado por el llamador
+    }
+};

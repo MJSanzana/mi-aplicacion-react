@@ -3,35 +3,30 @@ const db = require('../api/routes/db/db');
 const crypto = require('crypto');
 
 exports.registrarPago = async (req, res) => {
-    const { pedido_id, metodoPago_id, usuario_id, moneda, estado, proveedorPago_id, detalles } = req.body;
+    const { pedidoId, metodoPagoId, usuarioId, moneda, detalles } = req.body;
     let { monto } = req.body;
-    // Asegúrate de que monto es un número y conviértelo si es necesario
-    if (monto === undefined || monto === null || monto === '') {
-        return res.status(400).json({ error: 'El monto es obligatorio.' });
+
+    if (!monto || isNaN(parseFloat(monto))) {
+        return res.status(400).json({ error: 'El monto es inválido o está ausente.' });
     }
-    // Si monto es un string, reemplaza comas y puntos correctamente
-    if (typeof monto === 'string') {
-        monto = monto.replace(/\./g, '').replace(/,/g, '.');
-    }
-    const montoNumerico = parseFloat(monto);
-    if (isNaN(montoNumerico)) {
-        return res.status(400).json({ error: 'El monto debe ser un número válido.' });
-    }
-    // Continúa con el cifrado de detalles
-    const encryptedDetails = crypto.createHmac('sha256', process.env.PAYMENT_ENCRYPTION_KEY)
-        .update(detalles)
-        .digest('hex');
+    
+    monto = parseFloat(monto).toFixed(2); // Asegurar dos decimales
+
+    // Simular una respuesta de la pasarela de pago
+    const estadoPago = Math.random() < 0.9 ? 'exitoso' : 'fallido'; // 90% de probabilidad de éxito
+    const proveedorPagoId = crypto.randomBytes(12).toString('hex'); // ID simulado del proveedor de pagos
+
     try {
-        const result = await db.query(
-            'INSERT INTO Pagos (Pedido_Id, MetodoPago_Id, Usuario_Id, Monto, Moneda, Estado, ProveedorPago_Id, Detalles) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [pedido_id, metodoPago_id, usuario_id, montoNumerico, moneda, estado, proveedorPago_id, encryptedDetails]
-        );
-        res.status(200).json({ message: "Pago registrado con éxito", pagoId: result.insertId });
+        await db.query('INSERT INTO Pagos (Pedido_Id, MetodoPago_Id, Usuario_Id, Monto, Moneda, Estado, ProveedorPago_Id, Detalles) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+                       [pedidoId, metodoPagoId, usuarioId, monto, moneda, estadoPago, proveedorPagoId, detalles]);
+        
+        res.status(200).json({ message: "Pago registrado con éxito", estado: estadoPago });
     } catch (error) {
-        console.error(error);
+        console.error('Error al registrar el pago:', error);
         res.status(500).json({ error: 'Error al registrar el pago: ' + error.message });
     }
 };
+
 
 exports.obtenerPagos = async (req, res) => {
     const usuario_id = req.usuario.id;
@@ -44,5 +39,21 @@ exports.obtenerPagos = async (req, res) => {
     } catch (error) {
         console.error("Error en la consulta:", error.message);
         res.status(500).json({ error: error.message });
+    }
+};
+
+exports.crearPagoSimulado = async (req, res) => {
+    const { pedidoId, monto, moneda, usuarioId } = req.body;
+
+    try {
+        const estadoPago = Math.random() < 0.9 ? 'exitoso' : 'fallido';
+        const transaccionId = crypto.randomBytes(12).toString('hex');
+
+        await db.query('INSERT INTO Pagos (Pedido_Id, Monto, Moneda, Estado, ProveedorPago_Id, Usuario_Id) VALUES (?, ?, ?, ?, ?, ?)', 
+                       [pedidoId, monto, moneda, estadoPago, transaccionId, usuarioId ? usuarioId : null]);
+
+        res.status(200).json({ message: "Pago simulado registrado con éxito", estado: estadoPago, transaccionId: transaccionId });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al simular el pago: ' + error.message });
     }
 };

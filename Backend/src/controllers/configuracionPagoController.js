@@ -1,3 +1,4 @@
+//configuracionPagoController.js
 const db = require('../api/routes/db/db');
 const crypto = require('crypto');
 

@@ -27,25 +27,35 @@ function Productos({ changeView, setProductoSeleccionado }) {
 
 
   // Función para manejar agregar productos al carrito
+  // Función para manejar agregar productos al carrito
   const onAddToCart = (productToAdd) => {
     const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
     const existingProductIndex = cartItems.findIndex(item => item.Id === productToAdd.Id && item.talla === productToAdd.talla);
 
+    // Aquí asegúrate de que también estás pasando la imagen
+    const newProductToAdd = {
+      ...productToAdd,
+      Imagen: productToAdd.Imagen,
+    };
+
+    console.log("Agregando al carrito:", newProductToAdd); // Log para depuración
+
     if (existingProductIndex > -1) {
-      // Producto ya existe en el carrito, actualizar la cantidad
+      // Producto ya existe en el carrito, actualizar la cantidad y asegúrate de actualizar la imagen si es necesario
       const updatedItems = cartItems.map((item, index) => {
         if (index === existingProductIndex) {
-          return { ...item, cantidad: item.cantidad + productToAdd.cantidad };
+          return { ...item, cantidad: item.cantidad + newProductToAdd.cantidad, Imagen: newProductToAdd.Imagen };
         }
         return item;
       });
-
       localStorage.setItem('cartItems', JSON.stringify(updatedItems));
     } else {
       // Producto no existe en el carrito, agregar nuevo
-      localStorage.setItem('cartItems', JSON.stringify([...cartItems, productToAdd]));
+      localStorage.setItem('cartItems', JSON.stringify([...cartItems, newProductToAdd]));
     }
   };
+
+
 
   useEffect(() => {
     fetchProductos();
@@ -213,14 +223,24 @@ const ProductoModal = ({
   };
 
   const agregarAlCarrito = () => {
-    if (producto && tallaSeleccionada && cantidadAComprar > 0) {
-      // Aquí usas la función onAddToCart pasada como prop
-      onAddToCart({ ...producto, cantidad: cantidadAComprar, talla: tallaSeleccionada });
+    const varianteSeleccionada = variantes.find(v => v.Talla === tallaSeleccionada);
+    if (varianteSeleccionada && producto && cantidadAComprar > 0) {
+      const productoConVariante = {
+        ...producto,
+        cantidad: cantidadAComprar,
+        talla: tallaSeleccionada,
+        productoVarianteId: varianteSeleccionada.Id // Asegúrate de que este campo se llame igual en el backend
+
+      };
+      onAddToCart(productoConVariante);
       onHide();
     } else {
       alert('Por favor, selecciona una talla y asegúrate de que la cantidad sea mayor que 0.');
     }
   };
+
+
+
 
   const handleTallaChange = (talla) => {
     setTallaSeleccionada(talla);

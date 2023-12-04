@@ -43,10 +43,15 @@ function UserPage() {
     };
     // Función para cerrar sesión
     const handleLogout = () => {
-        // Realiza cualquier limpieza necesaria (por ejemplo, eliminar tokens de autenticación, etc.)
-        // Luego, actualiza el estado de autenticación a null o un valor vacío en tu contexto
+        // Elimina los datos de usuario de localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('tipoUsuario');
+        localStorage.removeItem('NombreUsuario');
+    
+        // Actualiza el estado de autenticación a null en tu contexto
         setUsuario(null);
-
+    
         // Redirige al usuario a la página de inicio de sesión o a donde desees
         navigate('/pagina-usuario'); // Ajusta la ruta según tus necesidades
     };
